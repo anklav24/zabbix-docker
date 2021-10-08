@@ -11,6 +11,7 @@ services:
     restart: always
     ports:
       - 8080:8080
+    # Прикрутить именнованный том чтобы просто хранил настройки?
 
   grafana-server: #optional more functional and creative UI
     # image: grafana/grafana:latest  # Bad for stability
@@ -23,13 +24,19 @@ services:
     restart: always
     #links:
     #  - zabbix-pgsql
+    # Прикрутить именнованный том чтобы просто хранил настройки?
 
   portainer:
     image: portainer/portainer-ce:2.9.0
     volumes:
-#      - ./data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer_data_test1:/data
+#      - portainer_data:/data_portainer/portainer-ce
+      - /var/run/docker.sock:/var/run/docker.sock  # Connect to docker API
     ports:
-      - "8000:8000"
+#      - "8000:8000"  # Исторически сложилось что нужен?
       - "9000:9000"
     restart: always
+    # Прикрутить именнованный том чтобы просто хранил настройки?
+
+volumes:
+  portainer_data:
