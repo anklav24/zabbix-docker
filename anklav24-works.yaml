@@ -1,0 +1,9 @@
+  adminer:  #Optional for accessing databases
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+  grafana-xxl:  #optional more functional and creative UI
+    image: monitoringartist/grafana-xxl:latest
+    ports:
+     - 3000:3000
