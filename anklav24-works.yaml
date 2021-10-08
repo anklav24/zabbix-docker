@@ -1,8 +1,14 @@
   adminer:  #Optional for accessing databases
+    # How to connect to web UI
+    # Server: NAME_OF_YOUR_POSTGRES_SERVER in our case it's postgres-server
+    # Username: DB_USERNAME
+    # Password: DB_PASSWORD
+    # Database: NAME_OF_ZABBIX_DB
     image: adminer
     restart: always
     ports:
       - 8080:8080
+
   grafana-xxl:  #optional more functional and creative UI
     image: monitoringartist/grafana-xxl:latest
     ports:
