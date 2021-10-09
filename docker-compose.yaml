@@ -1,4 +1,5 @@
-version: '3.1'
+version: "3.9"
+
 services:
 
   adminer:  #Optional for accessing databases
@@ -10,8 +11,8 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
-    # Прикрутить именнованный том чтобы просто хранил настройки?
+      - "8080:8080"
+    # Прикрутить именованный том чтобы просто хранил настройки?
 
   grafana-server: #optional more functional and creative UI
     # image: grafana/grafana:latest  # Bad for stability
@@ -25,7 +26,6 @@ services:
     restart: always
     #links:
     #  - zabbix-pgsql
-    # Прикрутить именнованный том чтобы просто хранил настройки?
 
   portainer:
     image: portainer/portainer-ce:2.9.0
