@@ -1,7 +1,6 @@
 version: '3.9'
 services:
  zabbix-server:
-#  image: zabbix/zabbix-server-pgsql:ubuntu-5.4.5
   image: zabbix/zabbix-server-pgsql:ubuntu-5.0.16
   ports:
    - "10051:10051"
@@ -41,14 +40,7 @@ services:
    - postgres-server
   networks:
    zbx_net_backend:
-#     aliases:
-#      - zabbix-server
-#      - zabbix-server-pgsql
-#      - zabbix-server-ubuntu-pgsql
-#      - zabbix-server-pgsql-ubuntu
    zbx_net_frontend:
-#  devices:
-#   - "/dev/ttyUSB0:/dev/ttyUSB0"
   stop_grace_period: 30s
   sysctls:
    - net.ipv4.ip_local_port_range=1024 65000
@@ -64,7 +56,6 @@ services:
   restart: always
 
  zabbix-web-nginx-pgsql:
-#  image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.4.5
   image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.0.16
   ports:
    - "80:8080"
@@ -101,10 +92,6 @@ services:
    start_period: 30s
   networks:
    zbx_net_backend:
-#    aliases:
-#     - zabbix-web-nginx-pgsql
-#     - zabbix-web-nginx-ubuntu-pgsql
-#     - zabbix-web-nginx-pgsql-ubuntu
    zbx_net_frontend:
   stop_grace_period: 10s
   sysctls:
@@ -119,7 +106,6 @@ services:
   restart: always
 
  zabbix-agent:
-#  image: zabbix/zabbix-agent:ubuntu-5.4.5
   image: zabbix/zabbix-agent:ubuntu-5.0.16
   ports:
    - "10050:10050"
@@ -145,10 +131,7 @@ services:
   networks:
    zbx_net_backend:
     aliases:
-#     - zabbix-agent
      - zabbix-server-agent
-#     - zabbix-agent-passive
-#     - zabbix-agent-ubuntu
   stop_grace_period: 5s
   labels:
    com.zabbix.description: "Zabbix agent"
@@ -158,7 +141,6 @@ services:
   restart: always
 
  postgres-server:
-#  image: postgres:13-alpine
   image: postgres:12-alpine
 #  command: -c ssl=on -c ssl_cert_file=/run/secrets/server-cert.pem -c ssl_key_file=/run/secrets/server-key.pem -c ssl_ca_file=/run/secrets/root-ca.pem
   volumes:
@@ -175,10 +157,6 @@ services:
   networks:
    zbx_net_backend:
   restart: always
-#    aliases:
-#     - postgres-server
-#     - pgsql-server
-#     - pgsql-database
 
 # TODO: Delete or not delete?
 # db_data_pgsql:
@@ -199,7 +177,6 @@ networks:
     driver: bridge
     driver_opts:
       com.docker.network.enable_ipv6: "false"
-#    internal: true  # Изолировать от инета?
     ipam:
       driver: default
       config:
