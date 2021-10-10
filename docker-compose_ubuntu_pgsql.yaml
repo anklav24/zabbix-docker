@@ -1,7 +1,8 @@
 version: '3.9'
 services:
  zabbix-server:
-  image: zabbix/zabbix-server-pgsql:ubuntu-5.4.5
+#  image: zabbix/zabbix-server-pgsql:ubuntu-5.4.5
+  image: zabbix/zabbix-server-pgsql:ubuntu-5.0.16
   ports:
    - "10051:10051"
   volumes:
@@ -40,11 +41,11 @@ services:
    - postgres-server
   networks:
    zbx_net_backend:
-     aliases:
-      - zabbix-server
-      - zabbix-server-pgsql
-      - zabbix-server-ubuntu-pgsql
-      - zabbix-server-pgsql-ubuntu
+#     aliases:
+#      - zabbix-server
+#      - zabbix-server-pgsql
+#      - zabbix-server-ubuntu-pgsql
+#      - zabbix-server-pgsql-ubuntu
    zbx_net_frontend:
 #  devices:
 #   - "/dev/ttyUSB0:/dev/ttyUSB0"
@@ -60,9 +61,11 @@ services:
    com.zabbix.component: "zabbix-server"
    com.zabbix.dbtype: "pgsql"
    com.zabbix.os: "ubuntu"
+  restart: always
 
  zabbix-web-nginx-pgsql:
-  image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.4.5
+#  image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.4.5
+  image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.0.16
   ports:
    - "80:8080"
    - "443:8443"
@@ -98,10 +101,10 @@ services:
    start_period: 30s
   networks:
    zbx_net_backend:
-    aliases:
-     - zabbix-web-nginx-pgsql
-     - zabbix-web-nginx-ubuntu-pgsql
-     - zabbix-web-nginx-pgsql-ubuntu
+#    aliases:
+#     - zabbix-web-nginx-pgsql
+#     - zabbix-web-nginx-ubuntu-pgsql
+#     - zabbix-web-nginx-pgsql-ubuntu
    zbx_net_frontend:
   stop_grace_period: 10s
   sysctls:
@@ -113,9 +116,11 @@ services:
    com.zabbix.webserver: "nginx"
    com.zabbix.dbtype: "pgsql"
    com.zabbix.os: "ubuntu"
+  restart: always
 
  zabbix-agent:
-  image: zabbix/zabbix-agent:ubuntu-5.4.5
+#  image: zabbix/zabbix-agent:ubuntu-5.4.5
+  image: zabbix/zabbix-agent:ubuntu-5.0.16
   ports:
    - "10050:10050"
   volumes:
@@ -140,19 +145,21 @@ services:
   networks:
    zbx_net_backend:
     aliases:
-     - zabbix-agent
+#     - zabbix-agent
      - zabbix-server-agent
-     - zabbix-agent-passive
-     - zabbix-agent-ubuntu
+#     - zabbix-agent-passive
+#     - zabbix-agent-ubuntu
   stop_grace_period: 5s
   labels:
    com.zabbix.description: "Zabbix agent"
    com.zabbix.company: "Zabbix LLC"
    com.zabbix.component: "zabbix-agentd"
    com.zabbix.os: "ubuntu"
+  restart: always
 
  postgres-server:
-  image: postgres:13-alpine
+#  image: postgres:13-alpine
+  image: postgres:12-alpine
 #  command: -c ssl=on -c ssl_cert_file=/run/secrets/server-cert.pem -c ssl_key_file=/run/secrets/server-key.pem -c ssl_ca_file=/run/secrets/root-ca.pem
   volumes:
    - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
@@ -167,15 +174,17 @@ services:
   stop_grace_period: 1m
   networks:
    zbx_net_backend:
-    aliases:
-     - postgres-server
-     - pgsql-server
-     - pgsql-database
+  restart: always
+#    aliases:
+#     - postgres-server
+#     - pgsql-server
+#     - pgsql-database
 
- db_data_pgsql:
-  image: busybox
-  volumes:
-   - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
+# TODO: Delete or not delete?
+# db_data_pgsql:
+#  image: busybox
+#  volumes:
+#   - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
 
 networks:
   zbx_net_frontend:
@@ -190,7 +199,7 @@ networks:
     driver: bridge
     driver_opts:
       com.docker.network.enable_ipv6: "false"
-    internal: true
+#    internal: true  # Изолировать от инета?
     ipam:
       driver: default
       config:
