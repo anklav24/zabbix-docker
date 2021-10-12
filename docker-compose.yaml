@@ -14,9 +14,6 @@ services:
    - ./zbx_env/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
    - ./zbx_env/var/lib/zabbix/mibs:/var/lib/zabbix/mibs:ro
    - ./zbx_env/var/lib/zabbix/snmptraps:/var/lib/zabbix/snmptraps:ro
-#   - ./env_vars/.ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
-#   - ./env_vars/.ZBX_DB_CERT_FILE:/run/secrets/client-cert.pem:ro
-#   - ./env_vars/.ZBX_DB_KEY_FILE:/run/secrets/client-key.pem:ro
   ulimits:
    nproc: 65535
    nofile:
@@ -59,14 +56,10 @@ services:
   image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.0.16
   ports:
    - "8080:8080"
-   - "8443:8443"
   volumes:
    - /etc/localtime:/etc/localtime:ro
    - ./zbx_env/etc/ssl/nginx:/etc/ssl/nginx:ro
    - ./zbx_env/usr/share/zabbix/modules/:/usr/share/zabbix/modules/:ro
-#   - ./env_vars/.ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
-#   - ./env_vars/.ZBX_DB_CERT_FILE:/run/secrets/client-cert.pem:ro
-#   - ./env_vars/.ZBX_DB_KEY_FILE:/run/secrets/client-key.pem:ro
   deploy:
    resources:
     limits:
@@ -142,7 +135,6 @@ services:
 
  postgres-server:
   image: postgres:12-alpine
-#  command: -c ssl=on -c ssl_cert_file=/run/secrets/server-cert.pem -c ssl_key_file=/run/secrets/server-key.pem -c ssl_ca_file=/run/secrets/root-ca.pem
   volumes:
    - /data/zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
    - ./env_vars/.ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
