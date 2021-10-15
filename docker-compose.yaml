@@ -145,6 +145,12 @@ services:
     secrets:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     stop_grace_period: 1m
     networks:
       zbx_net_backend:
@@ -158,6 +164,8 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     env_file:
       - ./env_vars/.env_pgadmin
+    depends_on:
+      - postgres-server
     networks:
       zbx_net_backend:
     restart: always
@@ -168,6 +176,16 @@ services:
       - grafana_storage:/var/lib/grafana
     ports:
       - "3000:3000"
+    depends_on:
+      - zabbix-server
+      - postgres-server
+      - zabbix-web-nginx-pgsql
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     networks:
       zbx_net_backend:
       zbx_net_frontend:
