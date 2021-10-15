@@ -11,37 +11,49 @@ services:
     image: adminer
     restart: always
     ports:
-      - "8080:8080"
+      - "8888:8080"
+    networks:
+      zabbix-docker_zbx_net_backend:
+      zabbix-docker_zbx_net_frontend:
     # Прикрутить именованный том чтобы просто хранил настройки?
 
   grafana-server: #optional more functional and creative UI
-    # image: grafana/grafana:latest  # Bad for stability
-    image: grafana/grafana:8.2.0
+    image: grafana/grafana:8.2.0-ubuntu
     volumes:
       - grafana_storage:/var/lib/grafana
 #      - /etc/ssl/grafana:/etc/ssl/grafana:ro
 #      - /etc/grafana/grafana.ini:/etc/grafana/grafana.ini
     ports:
       - "3000:3000"
+    networks:
+      zabbix-docker_zbx_net_backend:
+      zabbix-docker_zbx_net_frontend:
     restart: always
-    #links:
-    #  - zabbix-pgsql
 
   portainer:
-    image: portainer/portainer-ce:2.9.0
+    image: portainer/portainer-ce:2.9.1-alpine
     volumes:
       - portainer_data:/data  # Прикрутить именованный том чтобы просто хранил настройки?
       - /var/run/docker.sock:/var/run/docker.sock  # Connect to docker API
-      - ~/local-certs:/certs
+      # - ~/local-certs:/certs
     ports:
       - "8000:8000"
       - "9000:9000"  # legacy HTTP can be disabled by Force HTTPS only in settings.
       - "9443:9443"  # Self-sing SSL
-    command: --ssl
-             --sslcert /certs/portainer.crt
-             --sslkey /certs/portainer.key
+    #command: --ssl
+    #         --sslcert /certs/portainer.crt
+    #         --sslkey /certs/portainer.key
+    networks:
+      zabbix-docker_zbx_net_backend:
+      zabbix-docker_zbx_net_frontend:
     restart: always
 
 volumes:
   grafana_storage:
   portainer_data:
+
+networks:
+  zabbix-docker_zbx_net_frontend:
+    external: true
+  zabbix-docker_zbx_net_backend:
+    external: true
