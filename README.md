@@ -52,3 +52,7 @@ Version:
 - http://testing24.duckdns.org/pgadmin/
 - http://testing24.duckdns.org/grafana/
 - http://testing24.duckdns.org/mikrotik/
+
+### References
+- https://grafana.com/tutorials/run-grafana-behind-a-proxy/
+- https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
