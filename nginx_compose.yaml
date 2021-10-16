@@ -3,8 +3,8 @@ services:
     image: nginx:latest
     volumes:
       - ./nginx_config:/etc/nginx/conf.d/
-#      - ./data/certbot/conf:/etc/letsencrypt
-#      - ./data/certbot/www:/var/www/certbot
+      - ./zbx_env/certbot/etc/letsencrypt:/etc/letsencrypt
+      - ./zbx_env/certbot/var/www/certbot:/var/www/certbot
     ports:
       - 80:80
       - 443:443
@@ -15,9 +15,9 @@ services:
 
   certbot:
     image: certbot/certbot
-#    volumes:
-#      - ./data/certbot/conf:/etc/letsencrypt
-#      - ./data/certbot/www:/var/www/certbot
+    volumes:
+      - ./zbx_env/certbot/etc/letsencrypt:/etc/letsencrypt
+      - ./zbx_env/certbot/var/www/certbot:/var/www/certbot
     networks:
       zabbix-docker_zbx_net_backend:
       zabbix-docker_zbx_net_frontend:
