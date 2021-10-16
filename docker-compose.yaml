@@ -176,6 +176,8 @@ services:
       - grafana_storage:/var/lib/grafana
     ports:
       - "3000:3000"
+    env_file:
+      - ./env_vars/.env_grafana
     depends_on:
       - zabbix-server
       - postgres-server
