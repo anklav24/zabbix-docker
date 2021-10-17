@@ -168,6 +168,7 @@ services:
       - postgres-server
     networks:
       zbx_net_backend:
+      zbx_net_frontend:
     restart: always
 
   grafana: # optional more functional and creative UI for zabbix

@@ -1,0 +1,39 @@
+services:
+  reverse-proxy-traefik:
+    image: traefik:2.4
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik_config/traefik.yaml:/etc/traefik/traefik.yml:ro
+      - ./zbx_env/traefik_data/acme.json:/acme.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=https"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.testing24.duckdns.org`)"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=letsEncrypt"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.services.traefik-traefik.loadbalancer.server.port=888"
+      # Basic Authentication for Traefik Dashboard
+      # Generate password: sudo apt update && sudo apt install apache2-utils && htpasswd -nb USER PASSWORD
+      # You need to escape all $ sings ($ --> $$)
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$dQS.9m8b$$99bHXnFsbxXaa5StcfPRk/"
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+    healthcheck:
+      test: [ "CMD", "wget", "http://localhost:8082/ping","--spider" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      zabbix-docker_zbx_net_frontend:
+    restart: always
+
+networks:
+  zabbix-docker_zbx_net_frontend:
+    external: true

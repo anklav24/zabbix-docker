@@ -1,0 +1,38 @@
+#initContainers: []  # The ACME resolver \"letsEncrypt\" is skipped from the resolvers list because: unable to get ACME account: permissions 664 for acme.json are too open, please use 600"
+
+api:
+  dashboard: true
+
+entryPoints:
+  http:
+    address: ":80"
+  https:
+    address: ":443"
+
+http:
+  routers:
+    http-catchall:
+      rule: hostregexp(`{host:.+}`)
+      entrypoints:
+      - http
+      middlewares:
+      - redirect-to-https
+  middlewares:
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: false
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+
+certificatesResolvers:
+  letsEncrypt:
+    acme:
+      email: anklav24@gmail.com
+      storage: /etc/traefik/acme.json
+      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      httpCHallenge:
+        entryPoint: http
