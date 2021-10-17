@@ -34,7 +34,7 @@ Version:
   - Configuration - Plugins - Zabbix - Config - Enable
   - Configuration - Data sources - Add data source - Zabbix
   - Default - On
-  - URL: https://zabbix.testing24.duckdns.org/api_jsonrpc.php
+  - URL: http://zabbix-web-nginx-pgsql:8080/api_jsonrpc.php
   - Username: Admin  (Capital A)
   - Password: zabbix
   - Direct DB Connection - PostgreSQL (Optional)

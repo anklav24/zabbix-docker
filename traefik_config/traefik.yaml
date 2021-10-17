@@ -1,12 +1,10 @@
-# initContainers: []  # The ACME resolver \"letsEncrypt\" is skipped from the resolvers list because: unable to get ACME account: permissions 664 for acme.json are too open, please use 600"
-
 global:
   checkNewVersion: false
   sendAnonymousUsage: false
 
 api:
   dashboard: true  # true by default
-  insecure: true  # Don't do this in production!
+  insecure: false  # Don't do this in production!
 
 ping:
   entryPoint: ping
