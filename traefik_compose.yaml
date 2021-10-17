@@ -1,23 +1,6 @@
 version: '3.9'
 
 services:
-  nginx:
-    image: nginx
-    ports:
-      - "2222:80"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.nginx.entrypoints=http,https"
-#      - "traefik.http.routers.nginx.rule=Host(`testing24.duckdns.org`) && PathPrefix(`/nginx`)"
-      - "traefik.http.routers.nginx.rule=Host(`nginx.testing24.duckdns.org`)"
-#      - "traefik.http.routers.nginx.rule=PathPrefix(`/nginx`)"
-      - "traefik.http.routers.nginx.tls=true"
-      - "traefik.http.routers.nginx.tls.certresolver=staging"
-      - "traefik.http.services.nginx.loadbalancer.server.port=80"
-    networks:
-      zabbix-docker_zbx_net_frontend:
-    restart: always
-
   traefik:
     image: traefik:2.4
     ports:
@@ -53,10 +36,13 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
+      zabbix-docker_zbx_net_backend:
       zabbix-docker_zbx_net_frontend:
     restart: always
 
 networks:
+  zabbix-docker_zbx_net_backend:
+    external: true
   zabbix-docker_zbx_net_frontend:
     external: true
 

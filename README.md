@@ -34,7 +34,7 @@ Version:
   - Configuration - Plugins - Zabbix - Config - Enable
   - Configuration - Data sources - Add data source - Zabbix
   - Default - On
-  - URL: http://testing24.duckdns.org:8080/api_jsonrpc.php
+  - URL: https://zabbix.testing24.duckdns.org/api_jsonrpc.php
   - Username: Admin  (Capital A)
   - Password: zabbix
   - Direct DB Connection - PostgreSQL (Optional)
@@ -46,12 +46,21 @@ Version:
 - Долго подымается
 
 ### UI Links
+Nginx
 - http://testing24.duckdns.org/
 - http://testing24.duckdns.org/zabbix/
 - http://testing24.duckdns.org/portainer/
 - http://testing24.duckdns.org/pgadmin/
 - http://testing24.duckdns.org/grafana/
 - http://testing24.duckdns.org/mikrotik/
+
+Traefik
+- https://traefik.testing24.duckdns.org
+- https://zabbix.testing24.duckdns.org
+- https://portainer.testing24.duckdns.org
+- https://pgadmin.testing24.duckdns.org
+- https://grafana.testing24.duckdns.org
+- https://mikrotik.testing24.duckdns.org
 
 ### References
 - https://grafana.com/tutorials/run-grafana-behind-a-proxy/
