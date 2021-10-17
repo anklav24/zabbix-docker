@@ -184,6 +184,15 @@ services:
       - zabbix-server
       - postgres-server
       - zabbix-web-nginx-pgsql
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.entrypoints=http,https"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.testing24.duckdns.org`)"
+#      - "traefik.http.routers.grafana.rule=Host(`testing24.duckdns.org`) && PathPrefix(`/grafana`)"
+#      - "traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)"
+      - "traefik.http.routers.grafana.tls=true"
+      - "traefik.http.routers.grafana.tls.certresolver=staging"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
       interval: 10s
@@ -204,6 +213,15 @@ services:
       - "8000:8000"
       - "9000:9000"  # legacy HTTP can be disabled by Force HTTPS only in settings.
       - "9443:9443"  # Self-sing SSL
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.entrypoints=http,https"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.testing24.duckdns.org`)"
+#      - "traefik.http.routers.portainer.rule=Host(`testing24.duckdns.org`) && PathPrefix(`/portainer`)"
+#      - "traefik.http.routers.portainer.rule=PathPrefix(`/portainer`)"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=staging"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     networks:
       zbx_net_backend:
       zbx_net_frontend:

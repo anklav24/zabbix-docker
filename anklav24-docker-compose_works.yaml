@@ -155,22 +155,22 @@ services:
       retries: 3
       start_period: 5s
     labels:
-      - "traefik.enable=true"
-      # Traefik URL (replace with yours)
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.zabbix24.duckdns.org`)"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+#      - "traefik.enable=true"
+#       Traefik URL (replace with yours)
+#      - "traefik.http.routers.dashboard.rule=Host(`traefik.zabbix24.duckdns.org`)"
+#      - "traefik.http.routers.dashboard.service=api@internal"
+#      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+#      - "traefik.http.routers.dashboard.entrypoints=websecure"
+#      - "traefik.http.routers.dashboard.tls=true"
+#      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
       - "traefik.http.services.dashboard.loadbalancer.passhostheader=true"
-      - "traefik.http.routers.dashboard.middlewares=authtraefik"
+#      - "traefik.http.routers.dashboard.middlewares=authtraefik"
       # Basic Authentication for Traefik Dashboard
       # Username: traefikadmin (replace with yours)
       # Passwords must be encoded using MD5, SHA1, or BCrypt https://hostingcanada.org/htpasswd-generator/
-      - "traefik.http.middlewares.authtraefik.basicauth.users=admin:$$apr1$$jkb247fe$$bGQJhpgcv612VFaUmpRJu."
-      - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
-      - "traefik.http.routers.http-catchall.entrypoints=web"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+#      - "traefik.http.middlewares.authtraefik.basicauth.users=admin:$$apr1$$jkb247fe$$bGQJhpgcv612VFaUmpRJu."
+#      - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
+#      - "traefik.http.routers.http-catchall.entrypoints=web"
+#      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+#      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     restart: unless-stopped
