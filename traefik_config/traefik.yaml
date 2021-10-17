@@ -1,38 +1,55 @@
 #initContainers: []  # The ACME resolver \"letsEncrypt\" is skipped from the resolvers list because: unable to get ACME account: permissions 664 for acme.json are too open, please use 600"
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
 
 api:
-  dashboard: true
+  dashboard: true  # true by default
+  insecure: true  # Don't do this in production!
 
 entryPoints:
   http:
     address: ":80"
+    http:
+     redirections:
+       entryPoint:
+         to: https
+         scheme: https
   https:
     address: ":443"
 
-http:
-  routers:
-    http-catchall:
-      rule: hostregexp(`{host:.+}`)
-      entrypoints:
-      - http
-      middlewares:
-      - redirect-to-https
-  middlewares:
-    redirect-to-https:
-      redirectScheme:
-        scheme: https
-        permanent: false
+#http:
+#  routers:
+#    http-catchall:
+#      rule: hostregexp(`{host:.+}`)
+#      entrypoints:
+#      - http
+#      middlewares:
+#      - redirect-to-https
+#  middlewares:
+#    redirect-to-https:
+#      redirectScheme:
+#        scheme: https
+#        permanent: false
 
 providers:
   docker:
-    endpoint: "unix:///var/run/docker.sock"
+#    endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
 
 certificatesResolvers:
-  letsEncrypt:
+# letsEncrypt
+  staging:
     acme:
-      email: anklav24@gmail.com
+      email: anklav24@gmail.com  # TODO: Change this to your email
       storage: /etc/traefik/acme.json
       caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
-      httpCHallenge:
+      httpChallenge:
+        entryPoint: http
+  production:
+    acme:
+      email: anklav24@gmail.com  # TODO: Change this to your email
+      storage: /etc/traefik/acme.json
+      caServer: "https://acme-v02.api.letsencrypt.org/directory"
+      httpChallenge:
         entryPoint: http

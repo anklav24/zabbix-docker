@@ -1,20 +1,24 @@
+version: '3.9'
+
 services:
   reverse-proxy-traefik:
     image: traefik:2.4
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
+      # (Optional) Expose Dashboard
+      - "9999:8080"  # Don't do this in production!
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik_config/traefik.yaml:/etc/traefik/traefik.yml:ro
-      - ./zbx_env/traefik_data/acme.json:/acme.json
+      - ./zbx_env/traefik_data/acme.json:/etc/traefik/acme.json
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=https"
       - "traefik.http.routers.traefik.rule=Host(`traefik.testing24.duckdns.org`)"
       - "traefik.http.routers.traefik.tls=true"
-      - "traefik.http.routers.traefik.tls.certresolver=letsEncrypt"
+      - "traefik.http.routers.traefik.tls.certresolver=staging"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.services.traefik-traefik.loadbalancer.server.port=888"
       # Basic Authentication for Traefik Dashboard

@@ -1,4 +1,5 @@
 version: '3.9'
+
 services:
   zabbix-server:
     image: zabbix/zabbix-server-pgsql:ubuntu-5.0.16
