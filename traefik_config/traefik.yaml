@@ -2,9 +2,17 @@ global:
   checkNewVersion: false
   sendAnonymousUsage: false
 
+log:
+  level: INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: common  # common, json, logfmt
+  filePath: /var/log/traefik/traefik.log
+
+accesslog:
+ format: common  # common, json, logfmt
+ filePath: /var/log/traefik/access.log
+
 api:
   dashboard: true  # true by default
-  insecure: false  # Don't do this in production!
 
 ping:
   entryPoint: ping
@@ -26,6 +34,8 @@ providers:
   docker:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
+  file:
+    filename: /etc/traefik/tls.yaml
 
 certificatesResolvers: # letsEncrypt
   staging:

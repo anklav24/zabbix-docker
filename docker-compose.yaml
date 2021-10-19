@@ -23,11 +23,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.70'
-          memory: 1G
+          cpus: '0.10'
+          memory: 256M
         reservations:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.10'
+          memory: 128M
     env_file:
       - ./env_vars/.env_db_pgsql
       - ./env_vars/.env_srv
@@ -56,11 +56,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.70'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
+          cpus: '0.10'
           memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
     env_file:
       - ./env_vars/.env_db_pgsql
       - ./env_vars/.env_web
@@ -87,7 +87,7 @@ services:
       - "traefik.http.routers.zabbix.entrypoints=http,https"
       - "traefik.http.routers.zabbix.rule=Host(`zabbix.testing24.duckdns.org`)"
       - "traefik.http.routers.zabbix.tls=true"
-      - "traefik.http.routers.zabbix.tls.certresolver=staging"
+      - "traefik.http.routers.zabbix.tls.certresolver=production"
       - "traefik.http.services.zabbix.loadbalancer.server.port=8080"
     restart: always
 
@@ -104,7 +104,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.2'
+          cpus: '0.1'
           memory: 128M
         reservations:
           cpus: '0.1'
@@ -128,6 +128,14 @@ services:
       - ./env_vars/.ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
       - ./env_vars/.ZBX_DB_CERT_FILE:/run/secrets/server-cert.pem:ro
       - ./env_vars/.ZBX_DB_KEY_FILE:/run/secrets/server-key.pem:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '0.10'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
     env_file:
       - ./env_vars/.env_db_pgsql
     secrets:
@@ -148,6 +156,14 @@ services:
     image: dpage/pgadmin4:6.0
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+    deploy:
+      resources:
+        limits:
+          cpus: '0.10'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
     env_file:
       - ./env_vars/.env_pgadmin
     depends_on:
@@ -157,7 +173,7 @@ services:
       - "traefik.http.routers.pgadmin.entrypoints=http,https"
       - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.testing24.duckdns.org`)"
       - "traefik.http.routers.pgadmin.tls=true"
-      - "traefik.http.routers.pgadmin.tls.certresolver=staging"
+      - "traefik.http.routers.pgadmin.tls.certresolver=production"
     networks:
       zbx_net_backend:
       zbx_net_frontend:
@@ -167,6 +183,14 @@ services:
     image: grafana/grafana:8.2.0-ubuntu
     volumes:
       - grafana_storage:/var/lib/grafana
+    deploy:
+      resources:
+        limits:
+          cpus: '0.10'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
     env_file:
       - ./env_vars/.env_grafana
     depends_on:
@@ -179,7 +203,7 @@ services:
       - "traefik.http.routers.grafana.rule=Host(`grafana.testing24.duckdns.org`)"
 #      - "traefik.http.routers.grafana.rule=Host(`testing24.duckdns.org`) && PathPrefix(`/grafana`)"
       - "traefik.http.routers.grafana.tls=true"
-      - "traefik.http.routers.grafana.tls.certresolver=staging"
+      - "traefik.http.routers.grafana.tls.certresolver=production"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
@@ -197,12 +221,20 @@ services:
     volumes:
       - portainer_data:/data
       - /var/run/docker.sock:/var/run/docker.sock  # Connect to docker API
+    deploy:
+      resources:
+        limits:
+          cpus: '0.10'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.portainer.entrypoints=http,https"
       - "traefik.http.routers.portainer.rule=Host(`portainer.testing24.duckdns.org`)"
       - "traefik.http.routers.portainer.tls=true"
-      - "traefik.http.routers.portainer.tls.certresolver=staging"
+      - "traefik.http.routers.portainer.tls.certresolver=production"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     networks:
       zbx_net_backend:

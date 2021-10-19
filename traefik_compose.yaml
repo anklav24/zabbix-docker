@@ -13,18 +13,28 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.entrypoints=http,https"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.testing24.duckdns.org`)"
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.tls.certresolver=staging"
       - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
 
-      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.entrypoints=http,https"
+      - "traefik.http.routers.dashboard.middlewares=secheaders@file"
+      - "traefik.http.routers.dashboard.tls.certresolver=production"
+
       # Basic Authentication for Traefik Dashboard
       # Generate password: sudo apt update && sudo apt install apache2-utils && htpasswd -nb USER PASSWORD
       # You need to escape all $ sings ($ --> $$)
+      - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.middlewares=traefik-auth"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$dQS.9m8b$$99bHXnFsbxXaa5StcfPRk/"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.10'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
     healthcheck:
       test: [ "CMD", "wget", "http://localhost:8082/ping","--spider" ]
       interval: 10s
