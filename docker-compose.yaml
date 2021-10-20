@@ -4,7 +4,6 @@ services:
   zabbix-server:
     image: zabbix/zabbix-server-pgsql:ubuntu-5.0.16
 
-#    cpus: 0.05
     cpu_quota: 5000  # 1000 = 1%
     mem_reservation: 64M
 
@@ -44,9 +43,7 @@ services:
   zabbix-web-nginx-pgsql:
     image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.0.16
 
-#    cpus: 0.2
-#    cpu_quota: 20000  # 1000 = 1%
-    cpu_quota: 10000  # 1000 = 1%
+    cpu_quota: 50000  # 1000 = 1%
     mem_reservation: 256M
 
     volumes:
@@ -76,14 +73,13 @@ services:
       - "traefik.http.routers.zabbix.entrypoints=http,https"
       - "traefik.http.routers.zabbix.rule=Host(`zabbix.testing24.duckdns.org`)"
       - "traefik.http.routers.zabbix.tls=true"
-      - "traefik.http.routers.zabbix.tls.certresolver=production"
+      - "traefik.http.routers.zabbix.tls.certresolver=staging"
       - "traefik.http.services.zabbix.loadbalancer.server.port=8080"
     restart: always
 
   zabbix-agent:
     image: zabbix/zabbix-agent:ubuntu-5.0.16
 
-#    cpus: 0.05
     cpu_quota: 5000  # 1000 = 1%
     mem_reservation: 8M
 
@@ -109,13 +105,11 @@ services:
   postgres-server:
     image: postgres:12  # Поменять на ubuntu?
 
-#    cpus: 0.2
-#    cpu_quota: 20000  # 1000 = 1%
-    cpu_quota: 10000  # 1000 = 1%
+    cpu_quota: 50000  # 1000 = 1%
     mem_reservation: 256M
 
     volumes:
-      - /data/zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
+      - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
     env_file:
       - ./env_vars/.env_db_pgsql
     healthcheck:
@@ -129,35 +123,11 @@ services:
       zbx_net_backend:
     restart: always
 
-  pgadmin: # optional more functional and creative UI for PostgreSQL
-    image: dpage/pgadmin4:6.0
-
-#    cpus: 0.1
-    cpu_quota: 10000  # 1000 = 1%
-    mem_reservation: 256M
-
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    env_file:
-      - ./env_vars/.env_pgadmin
-    depends_on:
-      - postgres-server
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.pgadmin.entrypoints=http,https"
-      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.testing24.duckdns.org`)"
-      - "traefik.http.routers.pgadmin.tls=true"
-      - "traefik.http.routers.pgadmin.tls.certresolver=production"
-    networks:
-      zbx_net_backend:
-      zbx_net_frontend:
-    restart: always
 
   grafana: # optional more functional and creative UI for zabbix
     image: grafana/grafana:8.2.0-ubuntu
 
-#    cpus: 0.1
-    cpu_quota: 10000  # 1000 = 1%
+    cpu_quota: 50000  # 1000 = 1%
     mem_reservation: 128M
 
     volumes:
@@ -174,7 +144,7 @@ services:
       - "traefik.http.routers.grafana.rule=Host(`grafana.testing24.duckdns.org`)"
 #      - "traefik.http.routers.grafana.rule=Host(`testing24.duckdns.org`) && PathPrefix(`/grafana`)"
       - "traefik.http.routers.grafana.tls=true"
-      - "traefik.http.routers.grafana.tls.certresolver=production"
+      - "traefik.http.routers.grafana.tls.certresolver=staging"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
@@ -187,23 +157,44 @@ services:
       zbx_net_frontend:
     restart: always
 
-  portainer: # optional more functional and creative UI for docker
-    image: portainer/portainer-ce:2.9.1-alpine
+  traefik:
+    image: traefik:v2.5.3
 
-#    cpus: 0.05
-    cpu_quota: 5000  # 1000 = 1%
-    mem_reservation: 16M
+    cpu_quota: 10000  # 1000 = 1%
+    mem_reservation: 64M
 
+    ports:
+      - "80:80"
+      - "443:443"
     volumes:
-      - portainer_data:/data
-      - /var/run/docker.sock:/var/run/docker.sock  # Connect to docker API
+      - traefik-ssl-certs:/ssl-certs
+      - ./traefik_config/:/etc/traefik/
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portainer.entrypoints=http,https"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.testing24.duckdns.org`)"
-      - "traefik.http.routers.portainer.tls=true"
-      - "traefik.http.routers.portainer.tls.certresolver=production"
-      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.testing24.duckdns.org`)"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.entrypoints=http,https"
+      - "traefik.http.routers.dashboard.middlewares=secheaders@file"
+      - "traefik.http.routers.dashboard.tls.certresolver=staging"
+
+      # Basic Authentication for Traefik Dashboard
+      # Generate password: sudo apt update && sudo apt install apache2-utils && htpasswd -nb USER PASSWORD
+      # You need to escape all $ sings ($ --> $$)
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=traefik-auth"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$dQS.9m8b$$99bHXnFsbxXaa5StcfPRk/"
+    healthcheck:
+      test: [ "CMD", "wget", "http://localhost:8082/ping","--spider" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    security_opt:
+      - no-new-privileges:true
     networks:
       zbx_net_backend:
       zbx_net_frontend:
@@ -229,5 +220,4 @@ networks:
 
 volumes:  # Persistent data
   grafana_storage:
-  portainer_data:
-  pgadmin_data:
+  traefik-ssl-certs:

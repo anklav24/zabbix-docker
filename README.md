@@ -1,21 +1,70 @@
-# Zabbix, NGINX, PostgreSQL, Grafana, Portainer, PGadmin, HTTPS
+# Zabbix, PostgreSQL, Grafana, Traefik (TSL, HTTPS)
 
 Version:
 - Ubuntu 20.04
 - Zabbix
 - Postgres
 - Grafana
-- Portainer
-- PGadmin
-- Nginx (Reverse-proxy)
+- Traefik
 
+## Install
+
+- Install Docker
+  ```bash
+  # Устанавливаем докер
+  sudo apt-get update &&
+  sudo apt-get -y install apt-transport-https ca-certificates curl gnupg lsb-release &&
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg &&
+
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null &&
+
+  sudo apt-get update &&
+  sudo apt-get -y install docker-ce docker-ce-cli containerd.io &&
+
+  sudo usermod -aG docker $USER &&  # Чтобы каждый раз не вводить sudo перед docker
+  sudo reboot now  # У меня дальше без перезагрузки не сработало
+  ```
+- Test Docker
+  ```bash
+  docker run --rm hello-world &&  # Testing
+  docker ps -a  # Testing
+  ```
+- Install Docker Compose
+  ```bash
+  sudo curl -L "https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose &&
+  sudo chmod +x /usr/local/bin/docker-compose &&
+  docker-compose --version  # Test the installation.
+  ```
+- Копируем репозиторий
+  ```bash
+  sudo apt update && sudo apt install git && # Update repo info and Install git if you don't have it.
+
+  # Копируем репозиторий
+  cd ~ &&
+  git clone https://github.com/anklav24/zabbix-docker &&
+  cd zabbix-docker &&
+  ll
+  ```
+- Выбираем ветку (Опционально)
+  ```bash
+  # Опционально
+  cd zabbix-docker
+  git branch -va  # Смотрим ветки 
+  git checkout develop # и переключаемся в другую если нужна другая версия Zabbix
+  git branch -va  # Проверяем куда переключились
+  ```
 - Скопировать репозиторий
 - Создать папки с ошибками bind
 - Отредактировать все пароли и конфиги в env_vars
 - запустить контейнер
-    ```bash
-    docker-compose up -d
-    ```
+  ```bash
+  sudo mkdir -p ~/zabbix-docker/zbx_env/usr/share/zabbix/modules &&
+  cd ~/zabbix-docker &&
+  docker-compose up -d &&
+  docker-compose -f traefik_compose.yaml up -d
+  ```
 
 ### Grafana
 - PostgeSQL
