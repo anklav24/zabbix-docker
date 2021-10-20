@@ -7,9 +7,28 @@ Version:
 - Grafana
 - Traefik
 
-## Install
+# Update repo info and install git
+```bash
+sudo apt update &&
+sudo apt -y install git
+```
 
-- run install.sh
+# Clone the repository
+```bash
+cd ~ &&
+git clone https://github.com/anklav24/zabbix-docker &&
+cd zabbix-docker
+```
+
+# Select a branch (Optional)
+```bash
+git checkout develop
+```
+
+## Install
+```bash
+chmod +x install.sh && ./install.sh
+```
 
 ### Grafana
 - PostgeSQL

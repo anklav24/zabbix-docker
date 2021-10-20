@@ -25,8 +25,8 @@ services:
         soft: 20000
         hard: 40000
     env_file:
-      - deploy_configs/env_vars/.env_db_pgsql
-      - deploy_configs/env_vars/.env_srv
+      - ./deploy_configs/env_vars/.env_db_pgsql
+      - ./deploy_configs/env_vars/.env_srv
     depends_on:
       - postgres-server
     networks:
@@ -43,7 +43,7 @@ services:
   zabbix-web-nginx-pgsql:
     image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.0.16
 
-    cpu_quota: 50000  # 1000 = 1%
+    cpu_quota: 40000  # 1000 = 1%
     mem_reservation: 256M
 
     volumes:
@@ -51,8 +51,8 @@ services:
       - ./zbx_env/etc/ssl/nginx:/etc/ssl/nginx:ro
       - ./zbx_env/usr/share/zabbix/modules/:/usr/share/zabbix/modules/:ro
     env_file:
-      - deploy_configs/env_vars/.env_db_pgsql
-      - deploy_configs/env_vars/.env_web
+      - ./deploy_configs/env_vars/.env_db_pgsql
+      - ./deploy_configs/env_vars/.env_web
     depends_on:
       - postgres-server
       - zabbix-server
@@ -92,7 +92,7 @@ services:
       - ./zbx_env/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
       - ./zbx_env/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
     env_file:
-      - deploy_configs/env_vars/.env_agent
+      - ./deploy_configs/env_vars/.env_agent
     privileged: true
     pid: "host"
     networks:
@@ -105,13 +105,13 @@ services:
   postgres-server:
     image: postgres:12  # Поменять на ubuntu?
 
-    cpu_quota: 50000  # 1000 = 1%
+    cpu_quota: 40000  # 1000 = 1%
     mem_reservation: 256M
 
     volumes:
       - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
     env_file:
-      - deploy_configs/env_vars/.env_db_pgsql
+      - ./deploy_configs/env_vars/.env_db_pgsql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
@@ -127,14 +127,14 @@ services:
   grafana: # optional more functional and creative UI for zabbix
     image: grafana/grafana:8.2.0-ubuntu
 
-    cpu_quota: 50000  # 1000 = 1%
+    cpu_quota: 40000  # 1000 = 1%
     mem_reservation: 128M
 
     volumes:
       - grafana_storage:/var/lib/grafana
-      - ./grafana_config/grafana.ini:/etc/grafana/grafana.ini
+      - ./deploy_configs/grafana/grafana.ini:/etc/grafana/grafana.ini
     env_file:
-      - deploy_configs/env_vars/.env_grafana
+      - ./deploy_configs/grafana/.env_grafana
     depends_on:
       - zabbix-server
       - postgres-server
@@ -169,7 +169,7 @@ services:
       - "443:443"
     volumes:
       - traefik-ssl-certs:/ssl-certs
-      - ./traefik_config/:/etc/traefik/
+      - ./deploy_configs/traefik/:/etc/traefik/
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
