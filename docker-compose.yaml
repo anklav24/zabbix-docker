@@ -25,8 +25,8 @@ services:
         soft: 20000
         hard: 40000
     env_file:
-      - ./env_vars/.env_db_pgsql
-      - ./env_vars/.env_srv
+      - deploy_configs/env_vars/.env_db_pgsql
+      - deploy_configs/env_vars/.env_srv
     depends_on:
       - postgres-server
     networks:
@@ -51,8 +51,8 @@ services:
       - ./zbx_env/etc/ssl/nginx:/etc/ssl/nginx:ro
       - ./zbx_env/usr/share/zabbix/modules/:/usr/share/zabbix/modules/:ro
     env_file:
-      - ./env_vars/.env_db_pgsql
-      - ./env_vars/.env_web
+      - deploy_configs/env_vars/.env_db_pgsql
+      - deploy_configs/env_vars/.env_web
     depends_on:
       - postgres-server
       - zabbix-server
@@ -92,7 +92,7 @@ services:
       - ./zbx_env/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
       - ./zbx_env/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
     env_file:
-      - ./env_vars/.env_agent
+      - deploy_configs/env_vars/.env_agent
     privileged: true
     pid: "host"
     networks:
@@ -111,7 +111,7 @@ services:
     volumes:
       - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
     env_file:
-      - ./env_vars/.env_db_pgsql
+      - deploy_configs/env_vars/.env_db_pgsql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
@@ -132,8 +132,9 @@ services:
 
     volumes:
       - grafana_storage:/var/lib/grafana
+      - ./grafana_config/grafana.ini:/etc/grafana/grafana.ini
     env_file:
-      - ./env_vars/.env_grafana
+      - deploy_configs/env_vars/.env_grafana
     depends_on:
       - zabbix-server
       - postgres-server
