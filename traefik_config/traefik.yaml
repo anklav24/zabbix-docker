@@ -1,3 +1,16 @@
+certificatesResolvers: # letsEncrypt
+  staging:
+    acme: &staging_anchor
+      email: anklav24@gmail.com  # TODO: Change this to your email
+      storage: /ssl-certs/acme.json
+      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      httpChallenge:
+        entryPoint: http
+  production:
+    acme:
+      <<: *staging_anchor
+      caServer: "https://acme-v02.api.letsencrypt.org/directory"
+
 global:
   checkNewVersion: false
   sendAnonymousUsage: false
@@ -36,16 +49,3 @@ providers:
     exposedByDefault: false
   file:
     filename: /etc/traefik/tls.yaml
-
-certificatesResolvers: # letsEncrypt
-  staging:
-    acme: &staging_anchor
-      email: anklav24@gmail.com  # TODO: Change this to your email
-      storage: /ssl-certs/acme.json
-      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
-      httpChallenge:
-        entryPoint: http
-  production:
-    acme:
-      <<: *staging_anchor
-      caServer: "https://acme-v02.api.letsencrypt.org/directory"

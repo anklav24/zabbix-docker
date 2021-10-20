@@ -1,8 +1,14 @@
-version: '3.9'
+version: '2.4'
 
 services:
   traefik:
     image: traefik:v2.5.3
+
+#    cpus: 0.1
+    cpu_quota: 10000  # 1000 = 1%
+    cpu_shares: 2048
+    mem_reservation: 64M
+
     ports:
       - "80:80"
       - "443:443"
@@ -27,14 +33,7 @@ services:
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.middlewares=traefik-auth"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$dQS.9m8b$$99bHXnFsbxXaa5StcfPRk/"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.10'
-          memory: 256M
-        reservations:
-          cpus: '0.10'
-          memory: 128M
+
     healthcheck:
       test: [ "CMD", "wget", "http://localhost:8082/ping","--spider" ]
       interval: 10s
