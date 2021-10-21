@@ -55,6 +55,12 @@ chmod +x install.sh && ./install.sh
   - Click Plus button - Create - Dashboard - Add an empty panel - Add new metrics - Applye
   - Adjust - Refresh Time
 
+## Zabbix
+### Android Active Agent
+- [Android Zabbix Active Agent](https://play.google.com/store/apps/details?id=fr.damongeot.zabbixagent&hl=ru&gl=US)
+- [Template](https://github.com/muutech/zabbix-templates/tree/master/ANDROID)
+- Add autoregistration actions in Zabbix-Server
+- Enable discovery(?)
 
 ### UI Links
 Traefik
@@ -64,4 +70,9 @@ Traefik
 - https://mikrotik.testing24.duckdns.org
 
 ### References
+- https://www.duckdns.org/
+- https://ssllabs.com/ssltest
+- https://hstspreload.org/
 - https://grafana.com/tutorials/run-grafana-behind-a-proxy/
+- https://github.com/muutech/zabbix-templates/tree/master/ANDROID
+- https://play.google.com/store/apps/details?id=fr.damongeot.zabbixagent&hl=ru&gl=US
