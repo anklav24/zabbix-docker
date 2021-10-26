@@ -47,7 +47,7 @@ docker-compose up -d
 - PostgeSQL
   - Configuration
     - Configuration - Data sources - Add data source - PostgreSQL
-    - Host: postgres-server
+    - Host: postgres-server or zabbix-server24.duckdns.org:5432
     - Database: zabbix
     - User: zabbix
     - TLS/SSL Mode: disable
@@ -75,7 +75,7 @@ docker-compose up -d
 - Add autoregistration actions in Zabbix-Server
 - Enable discovery(?)
  
-### Windows Passive/Active agents
+### Windows Passive/Active agents with TLS
 - Generate and save ```C:\Program Files\Zabbix Agent\zabbix_agentd.psk```
   ```bash
   openssl rand -hex 32
@@ -88,6 +88,9 @@ docker-compose up -d
   TLSPSKIdentity=NZXT-HOME-PC
   ```
 - Restart the agent service from the task manager
+
+### Mikrotik SNMP
+- Enable SNMP and add corresponding IP's
 
 ### UI Links
 Traefik
