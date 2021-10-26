@@ -43,7 +43,7 @@ services:
   zabbix-web-nginx-pgsql:
     image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.0.16
 
-    cpu_quota: 40000  # 1000 = 1%
+    cpu_quota: 80000  # 1000 = 1%
     mem_reservation: 256M
 
     volumes:
@@ -105,7 +105,7 @@ services:
   postgres-server:
     image: postgres:12  # Поменять на ubuntu?
 
-    cpu_quota: 40000  # 1000 = 1%
+    cpu_quota: 80000  # 1000 = 1%
     mem_reservation: 256M
 
     volumes:
@@ -127,7 +127,7 @@ services:
   grafana: # optional more functional and creative UI for zabbix
     image: grafana/grafana:8.2.0-ubuntu
 
-    cpu_quota: 40000  # 1000 = 1%
+    cpu_quota: 80000  # 1000 = 1%
     mem_reservation: 128M
 
     volumes:
