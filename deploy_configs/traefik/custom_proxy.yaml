@@ -1,0 +1,16 @@
+http:
+  routers:
+    host:
+      entryPoints:
+        - http
+        - https
+      service: service-host
+      rule: Host(`mikrotik.zabbix-web24.duckdns.org`)
+      tls:
+        certResolver: staging
+  services:
+    service-host:
+      loadBalancer:
+        servers:
+        - url: http://mikrotik24.duckdns.org/
+        passHostHeader: true
