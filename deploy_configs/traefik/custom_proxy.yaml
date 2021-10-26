@@ -5,7 +5,7 @@ http:
         - http
         - https
       service: service-host
-      rule: Host(`mikrotik.testing24.duckdns.org`)
+      rule: Host(`mikrotik.zabbix-web24.duckdns.org`)
       tls:
         certResolver: staging
   services:

@@ -71,7 +71,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.zabbix.entrypoints=http,https"
-      - "traefik.http.routers.zabbix.rule=Host(`zabbix.testing24.duckdns.org`)"
+      - "traefik.http.routers.zabbix.rule=Host(`zabbix.zabbix-web24.duckdns.org`)"
       - "traefik.http.routers.zabbix.tls=true"
       - "traefik.http.routers.zabbix.tls.certresolver=staging"
       - "traefik.http.services.zabbix.loadbalancer.server.port=8080"
@@ -142,8 +142,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.entrypoints=http,https"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.testing24.duckdns.org`)"
-#      - "traefik.http.routers.grafana.rule=Host(`testing24.duckdns.org`) && PathPrefix(`/grafana`)"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.zabbix-web24.duckdns.org`)"
+#      - "traefik.http.routers.grafana.rule=Host(`zabbix-web24.duckdns.org`) && PathPrefix(`/grafana`)"
       - "traefik.http.routers.grafana.tls=true"
       - "traefik.http.routers.grafana.tls.certresolver=staging"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
@@ -174,7 +174,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.testing24.duckdns.org`)"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.zabbix-web24.duckdns.org`)"
       - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
 
       - "traefik.http.routers.dashboard.tls=true"

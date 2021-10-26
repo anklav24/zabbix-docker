@@ -1,33 +1,46 @@
 # Zabbix, PostgreSQL, Grafana, Traefik (TSL, HTTPS)
 
-Version:
+## Requirements
+- Oracle VPS Free Tier (VM.Standard.E2.1.Micro)
 - Ubuntu 20.04
+
+## Version
 - Zabbix
 - Postgres
 - Grafana
 - Traefik
 
-# Update repo info and install git
-```bash
-sudo apt update &&
-sudo apt -y install git
-```
-
-# Clone the repository
+## Clone the repository
 ```bash
 cd ~ &&
 git clone https://github.com/anklav24/zabbix-docker &&
 cd zabbix-docker
 ```
 
-# Select a branch (Optional)
+## Select a branch (Optional)
 ```bash
 git checkout develop
 ```
 
 ## Install
+Docker, Docker-compose and other stuff.
 ```bash
 chmod +x install.sh && ./install.sh
+```
+
+## Run compose files
+For a split config use these two commands on two servers:
+```bash
+cd ~/zabbix-docker
+```
+```bash
+docker-compose -f zabbix-server-docker-compose.yaml up -d
+
+docker-compose -f zabbix-web-docker-compose.yaml up -d
+```
+If you have one powerfull VPS use:
+```bash
+docker-compose up -d
 ```
 
 ### Grafana
@@ -78,10 +91,10 @@ chmod +x install.sh && ./install.sh
 
 ### UI Links
 Traefik
-- https://traefik.testing24.duckdns.org
-- https://zabbix.testing24.duckdns.org
-- https://grafana.testing24.duckdns.org
-- https://mikrotik.testing24.duckdns.org
+- https://traefik.zabbix-web24.duckdns.org
+- https://zabbix.zabbix-web24.duckdns.org
+- https://grafana.zabbix-web24.duckdns.org
+- https://mikrotik.zabbix-web24.duckdns.org
 
 ### References
 - https://www.duckdns.org/
