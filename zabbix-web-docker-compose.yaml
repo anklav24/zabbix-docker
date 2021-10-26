@@ -30,7 +30,7 @@ services:
       # You need to escape all $ sings ($ --> $$)
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.middlewares=traefik-auth"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$dQS.9m8b$$99bHXnFsbxXaa5StcfPRk/"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=Oracle:$$apr1$$l5wr.jVu$$A/jaVwgCmnakAtZcp58IB1"
     healthcheck:
       test: [ "CMD", "wget", "http://localhost:8082/ping","--spider" ]
       interval: 10s
@@ -95,7 +95,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.entrypoints=http,https"
       - "traefik.http.routers.grafana.rule=Host(`grafana.zabbix-web24.duckdns.org`)"
-#      - "traefik.http.routers.grafana.rule=Host(`zabbix-web24.duckdns.org`) && PathPrefix(`/grafana`)"
       - "traefik.http.routers.grafana.tls=true"
       - "traefik.http.routers.grafana.tls.certresolver=staging"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
