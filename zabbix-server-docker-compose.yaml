@@ -1,0 +1,98 @@
+version: '2.4'
+
+services:
+  zabbix-server:
+    image: zabbix/zabbix-server-pgsql:ubuntu-5.0.16
+
+    cpu_quota: 5000  # 1000 = 1%
+    mem_reservation: 64M
+
+    ports:
+      - "10051:10051"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./zbx_env/usr/lib/zabbix/alertscripts:/usr/lib/zabbix/alertscripts:ro
+      - ./zbx_env/usr/lib/zabbix/externalscripts:/usr/lib/zabbix/externalscripts:ro
+      - ./zbx_env/var/lib/zabbix/export:/var/lib/zabbix/export:rw
+      - ./zbx_env/var/lib/zabbix/modules:/var/lib/zabbix/modules:ro
+      - ./zbx_env/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
+      - ./zbx_env/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
+      - ./zbx_env/var/lib/zabbix/mibs:/var/lib/zabbix/mibs:ro
+      - ./zbx_env/var/lib/zabbix/snmptraps:/var/lib/zabbix/snmptraps:ro
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    env_file:
+      - ./deploy_configs/env_vars/.env_db_pgsql
+      - ./deploy_configs/env_vars/.env_srv
+    depends_on:
+      - postgres-server
+    networks:
+      zbx_net_backend:
+    stop_grace_period: 30s
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65000
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
+    restart: always
+
+  zabbix-agent:
+    image: zabbix/zabbix-agent:ubuntu-5.0.16
+
+    cpu_quota: 5000  # 1000 = 1%
+    mem_reservation: 8M
+
+    ports:
+      - "10050:10050"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./zbx_env/etc/zabbix/zabbix_agentd.d:/etc/zabbix/zabbix_agentd.d:ro
+      - ./zbx_env/var/lib/zabbix/modules:/var/lib/zabbix/modules:ro
+      - ./zbx_env/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
+      - ./zbx_env/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
+    env_file:
+      - ./deploy_configs/env_vars/.env_agent
+    privileged: true
+    pid: "host"
+    networks:
+      zbx_net_backend:
+        aliases:
+          - zabbix-server-agent
+    stop_grace_period: 5s
+    restart: always
+
+  postgres-server:
+    image: postgres:12  # Поменять на ubuntu?
+
+    cpu_quota: 80000  # 1000 = 1%
+    mem_reservation: 256M
+
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
+    env_file:
+      - ./deploy_configs/env_vars/.env_db_pgsql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    stop_grace_period: 1m
+    networks:
+      zbx_net_backend:
+    restart: always
+
+networks:
+  zbx_net_backend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.239.0/24
