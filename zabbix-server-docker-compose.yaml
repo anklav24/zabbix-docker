@@ -4,7 +4,7 @@ services:
   zabbix-server:
     image: zabbix/zabbix-server-pgsql:ubuntu-5.0.16
 
-    cpu_quota: 5000  # 1000 = 1%
+    cpu_quota: 10000  # 1000 = 1%
     mem_reservation: 64M
 
     ports:
@@ -42,7 +42,7 @@ services:
   zabbix-agent:
     image: zabbix/zabbix-agent:ubuntu-5.0.16
 
-    cpu_quota: 5000  # 1000 = 1%
+    cpu_quota: 10000  # 1000 = 1%
     mem_reservation: 8M
 
     ports:

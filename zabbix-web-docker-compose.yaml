@@ -55,8 +55,8 @@ services:
       - ./zbx_env/etc/ssl/nginx:/etc/ssl/nginx:ro
       - ./zbx_env/usr/share/zabbix/modules/:/usr/share/zabbix/modules/:ro
     env_file:
-      - ./deploy_configs/env_vars/.env_db_pgsql_server2
-      - ./deploy_configs/env_vars/.env_web_server2
+      - deploy_configs/env_vars/.env_db_pgsql_two_servers
+      - deploy_configs/env_vars/.env_web_two_servers
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 10s
@@ -125,7 +125,7 @@ services:
       - ./zbx_env/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
       - ./zbx_env/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
     env_file:
-      - ./deploy_configs/env_vars/.env_agent_server2
+      - deploy_configs/env_vars/.env_agent_two_servers
     privileged: true
     pid: "host"
     networks:
