@@ -1,16 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-10-21T13:58:50Z</date>
+    <date>2021-10-26T19:20:31Z</date>
     <groups>
         <group>
+            <name>Android</name>
+        </group>
+        <group>
+            <name>Linux servers</name>
+        </group>
+        <group>
+            <name>Mikrotik</name>
+        </group>
+        <group>
             <name>Windows</name>
+        </group>
+        <group>
+            <name>Zabbix servers</name>
         </group>
     </groups>
     <hosts>
         <host>
+            <host>Honor-10-Anklav24</host>
+            <name>Honor-10-Anklav24</name>
+            <templates>
+                <template>
+                    <name>Android Template</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Android</name>
+                </group>
+            </groups>
+            <interfaces>
+                <interface>
+                    <useip>NO</useip>
+                    <dns>mikrotik24.duckdns.org</dns>
+                    <interface_ref>if1</interface_ref>
+                </interface>
+            </interfaces>
+            <inventory_mode>DISABLED</inventory_mode>
+        </host>
+        <host>
+            <host>Mikrotik-Home</host>
+            <name>Mikrotik-Home</name>
+            <templates>
+                <template>
+                    <name>Template Net Mikrotik SNMPv2</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Mikrotik</name>
+                </group>
+            </groups>
+            <interfaces>
+                <interface>
+                    <type>SNMP</type>
+                    <ip>109.174.0.50</ip>
+                    <dns>mikrotik24.duckdns.org</dns>
+                    <port>161</port>
+                    <details>
+                        <community>{$SNMP_COMMUNITY}</community>
+                    </details>
+                    <interface_ref>if1</interface_ref>
+                </interface>
+            </interfaces>
+            <inventory_mode>DISABLED</inventory_mode>
+        </host>
+        <host>
             <host>NOTEBOOK-MSI-PC</host>
             <name>NOTEBOOK-MSI-PC</name>
+            <tls_connect>TLS_PSK</tls_connect>
+            <tls_accept>
+                <option>TLS_PSK</option>
+            </tls_accept>
+            <tls_psk_identity>NOTEBOOK-MSI-PC</tls_psk_identity>
+            <tls_psk>a52c474b525c75e757c3b36d44987c9ae121f6543d1534cb7e47fcd86b26cs12</tls_psk>
             <templates>
                 <template>
                     <name>Template Nvidia GPUs Performance</name>
@@ -41,6 +108,12 @@
         <host>
             <host>NZXT-HOME-PC</host>
             <name>NZXT-HOME-PC</name>
+            <tls_connect>TLS_PSK</tls_connect>
+            <tls_accept>
+                <option>TLS_PSK</option>
+            </tls_accept>
+            <tls_psk_identity>NZXT-HOME-PC</tls_psk_identity>
+            <tls_psk>a52c474b525c75e757c3b36d44987c9ae121f6543d1534cb7e47fcd86b26cs12</tls_psk>
             <templates>
                 <template>
                     <name>Template Nvidia GPUs Performance</name>
@@ -71,6 +144,12 @@
         <host>
             <host>RIG-01-PC</host>
             <name>RIG-01-PC</name>
+            <tls_connect>TLS_PSK</tls_connect>
+            <tls_accept>
+                <option>TLS_PSK</option>
+            </tls_accept>
+            <tls_psk_identity>RIG-01-PC</tls_psk_identity>
+            <tls_psk>a52c474b525c75e757c3b36d44987c9ae121f6543d1534cb7e47fcd86b26cs12</tls_psk>
             <templates>
                 <template>
                     <name>Template Nvidia GPUs Performance</name>
@@ -93,6 +172,57 @@
                     <ip>109.174.0.50</ip>
                     <dns>mikrotik24.duckdns.org</dns>
                     <port>10054</port>
+                    <interface_ref>if1</interface_ref>
+                </interface>
+            </interfaces>
+            <inventory_mode>DISABLED</inventory_mode>
+        </host>
+        <host>
+            <host>zabbix-server</host>
+            <name>zabbix-server</name>
+            <templates>
+                <template>
+                    <name>Template App Zabbix Server</name>
+                </template>
+                <template>
+                    <name>Template OS Linux by Zabbix agent</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Zabbix servers</name>
+                </group>
+            </groups>
+            <interfaces>
+                <interface>
+                    <useip>NO</useip>
+                    <dns>zabbix-server-agent</dns>
+                    <interface_ref>if1</interface_ref>
+                </interface>
+            </interfaces>
+            <inventory_mode>DISABLED</inventory_mode>
+        </host>
+        <host>
+            <host>zabbix-web</host>
+            <name>zabbix-web</name>
+            <templates>
+                <template>
+                    <name>Template OS Linux by Zabbix agent</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Linux servers</name>
+                </group>
+                <group>
+                    <name>Zabbix servers</name>
+                </group>
+            </groups>
+            <interfaces>
+                <interface>
+                    <useip>NO</useip>
+                    <ip>155.248.202.125</ip>
+                    <dns>zabbix-web24.duckdns.org</dns>
                     <interface_ref>if1</interface_ref>
                 </interface>
             </interfaces>
