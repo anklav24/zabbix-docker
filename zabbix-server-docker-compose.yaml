@@ -76,6 +76,7 @@ services:
       - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
     env_file:
       - ./deploy_configs/env_vars/.env_db_pgsql
+    command: -c 'max_connections=200'
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
