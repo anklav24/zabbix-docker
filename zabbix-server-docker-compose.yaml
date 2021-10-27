@@ -4,8 +4,8 @@ services:
   zabbix-server:
     image: zabbix/zabbix-server-pgsql:ubuntu-5.0.16
 
-    cpu_quota: 10000  # 1000 = 1%
-    mem_reservation: 64M
+    cpu_quota: 30000  # 1000 = 1%
+    mem_reservation: 256M
 
     ports:
       - "10051:10051"
@@ -67,7 +67,7 @@ services:
   postgres-server:
     image: postgres:12  # Поменять на ubuntu?
 
-    cpu_quota: 80000  # 1000 = 1%
+    cpu_quota: 70000  # 1000 = 1%
     mem_reservation: 256M
 
     ports:
