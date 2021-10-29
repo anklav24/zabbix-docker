@@ -1,14 +1,17 @@
-# Zabbix, PostgreSQL, Grafana, Traefik (TSL, HTTPS)
+# Zabbix, PostgreSQL, Grafana, Traefik (TLS, HTTPS)
+
+## Tested
+- 2021-10-29
 
 ## Requirements
 - Oracle VPS Free Tier (VM.Standard.E2.1.Micro)
 - Ubuntu 20.04
 
 ## Version
-- Zabbix
-- Postgres
-- Grafana
-- Traefik
+- Zabbix 5.0.16
+- Postgres 12
+- Grafana 8.2.0
+- Traefik 2.5.3
 
 ## Clone the repository
 ```bash
@@ -17,10 +20,13 @@ git clone https://github.com/anklav24/zabbix-docker &&
 cd zabbix-docker
 ```
 
-## Select a branch (Optional)
+## Select a develop branch (Optional)
 ```bash
 git checkout develop
 ```
+
+## Check ```deploy_configs``` and ```*-docker-compose.yaml```
+Replace domains, envs, emails, logins, passwords and tls.certresolver on yours!
 
 ## Install
 Docker, Docker-compose and other stuff.
@@ -29,7 +35,7 @@ chmod +x install.sh && ./install.sh
 ```
 
 ## Run compose files
-For a split config use these two commands on two servers:
+For a split config, use one of these two commands on the two servers:
 ```bash
 cd ~/zabbix-docker
 ```
@@ -54,7 +60,6 @@ docker-compose up -d
     - Version: 12+
   - Verify that you connect
     - Go to Explore and do some queries
-
 
 - Zabbix plugin
   - Configuration - Plugins - Zabbix - Config - Enable
