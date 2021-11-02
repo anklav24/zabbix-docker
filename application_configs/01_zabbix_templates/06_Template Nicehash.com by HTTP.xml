@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-11-02T07:38:44Z</date>
+    <groups>
+        <group>
+            <name>Templates/Applications</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template Nicehash.com by HTTP</template>
+            <name>Template Nicehash.com by HTTP</name>
+            <groups>
+                <group>
+                    <name>Templates/Applications</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>RIG LIST</name>
+                </application>
+                <application>
+                    <name>Web scenarios</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>devicesStatuses.DISABLED</name>
+                    <type>HTTP_AGENT</type>
+                    <key>devicesStatuses.DISABLED</key>
+                    <delay>15s</delay>
+                    <history>7d</history>
+                    <applications>
+                        <application>
+                            <name>RIG LIST</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.devicesStatuses.DISABLED</params>
+                        </step>
+                    </preprocessing>
+                    <url>https://api2.nicehash.com/main/api/v2/mining/external/{$BTCADDRESS}/rigs2</url>
+                </item>
+                <item>
+                    <name>devicesStatuses.MINING</name>
+                    <type>HTTP_AGENT</type>
+                    <key>devicesStatuses.MINING</key>
+                    <delay>15s</delay>
+                    <history>7d</history>
+                    <applications>
+                        <application>
+                            <name>RIG LIST</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.devicesStatuses.MINING</params>
+                        </step>
+                    </preprocessing>
+                    <url>https://api2.nicehash.com/main/api/v2/mining/external/{$BTCADDRESS}/rigs2</url>
+                </item>
+                <item>
+                    <name>minerStatuses.MINING</name>
+                    <type>HTTP_AGENT</type>
+                    <key>minerStatuses.MINING</key>
+                    <delay>15s</delay>
+                    <history>7d</history>
+                    <applications>
+                        <application>
+                            <name>RIG LIST</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.minerStatuses.MINING</params>
+                        </step>
+                    </preprocessing>
+                    <url>https://api2.nicehash.com/main/api/v2/mining/external/{$BTCADDRESS}/rigs2</url>
+                </item>
+                <item>
+                    <name>totalDevices</name>
+                    <type>HTTP_AGENT</type>
+                    <key>totalDevices</key>
+                    <delay>15s</delay>
+                    <history>7d</history>
+                    <applications>
+                        <application>
+                            <name>RIG LIST</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.totalDevices</params>
+                        </step>
+                    </preprocessing>
+                    <url>https://api2.nicehash.com/main/api/v2/mining/external/{$BTCADDRESS}/rigs2</url>
+                </item>
+                <item>
+                    <name>totalRigs</name>
+                    <type>HTTP_AGENT</type>
+                    <key>totalRigs</key>
+                    <delay>15s</delay>
+                    <history>7d</history>
+                    <applications>
+                        <application>
+                            <name>RIG LIST</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.totalRigs</params>
+                        </step>
+                    </preprocessing>
+                    <url>https://api2.nicehash.com/main/api/v2/mining/external/{$BTCADDRESS}/rigs2</url>
+                </item>
+            </items>
+            <httptests>
+                <httptest>
+                    <name>Check API</name>
+                    <application>
+                        <name>Web scenarios</name>
+                    </application>
+                    <delay>15s</delay>
+                    <steps>
+                        <step>
+                            <name>RIG LIST METHOD</name>
+                            <url>https://api2.nicehash.com/main/api/v2/mining/external/{$BTCADDRESS}/rigs2</url>
+                            <follow_redirects>NO</follow_redirects>
+                            <timeout>3s</timeout>
+                        </step>
+                        <step>
+                            <name>ANOTHER METHOD</name>
+                            <url>https://api2.nicehash.com/main/api/v2/mining/external/{$BTCADDRESS}/rigs2</url>
+                            <follow_redirects>NO</follow_redirects>
+                            <timeout>3s</timeout>
+                        </step>
+                    </steps>
+                </httptest>
+            </httptests>
+            <tags>
+                <tag>
+                    <tag>Custom</tag>
+                </tag>
+            </tags>
+            <macros>
+                <macro>
+                    <macro>{$BTCADDRESS}</macro>
+                    <value>INSERT_YOUR_BTC_ADDRESS</value>
+                    <description>Insert your BTC address</description>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <triggers>
+        <trigger>
+            <expression>{Template Nicehash.com by HTTP:devicesStatuses.MINING.last()}&lt;{Template Nicehash.com by HTTP:totalDevices.last()}</expression>
+            <name>GPU Mining down</name>
+            <opdata>devicesStatuses.MINING: {ITEM.LASTVALUE1} totalDevices: {ITEM.LASTVALUE2}</opdata>
+            <priority>AVERAGE</priority>
+        </trigger>
+        <trigger>
+            <expression>{Template Nicehash.com by HTTP:web.test.error[Check API].last(1m)}&lt;&gt;&quot;qwerty&quot;</expression>
+            <name>Last error message of scenario &quot;Check API&quot;</name>
+            <priority>WARNING</priority>
+            <manual_close>YES</manual_close>
+        </trigger>
+        <trigger>
+            <expression>{Template Nicehash.com by HTTP:minerStatuses.MINING.last()}&lt;{Template Nicehash.com by HTTP:totalRigs.last()}</expression>
+            <name>Mining soft down</name>
+            <opdata>minerStatuses.MINING: {ITEM.LASTVALUE1} totalRigs: {ITEM.LASTVALUE2}</opdata>
+            <priority>HIGH</priority>
+        </trigger>
+        <trigger>
+            <expression>{Template Nicehash.com by HTTP:web.test.rspcode[Check API,RIG LIST METHOD].last()}&lt;&gt;200</expression>
+            <name>RIG LIST METHOD</name>
+            <opdata>Response code: {ITEM.LASTVALUE1}</opdata>
+            <priority>WARNING</priority>
+        </trigger>
+    </triggers>
+</zabbix_export>
