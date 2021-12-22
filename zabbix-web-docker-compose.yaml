@@ -12,6 +12,7 @@ services:
       - "443:443"
     volumes:
       - traefik-ssl-certs:/ssl-certs
+      - /var/log/traefik:/var/log/traefik
       - ./deploy_configs/traefik/:/etc/traefik/
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro

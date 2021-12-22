@@ -97,6 +97,10 @@ docker-compose up -d
 ### Mikrotik SNMP
 - Enable SNMP and add corresponding IP's
 
+### Traefik
+- Setup `logrotate` check config in `deploy_configs/logrotate.d/traefik`
+- Or turn off logs
+
 ### UI Links
 - https://traefik.zabbix-web24.duckdns.org  (Restricted by IP using Traefik)
 - https://zabbix.zabbix-web24.duckdns.org
@@ -110,6 +114,7 @@ docker-compose up -d
 - https://doc.traefik.io/traefik/
 - https://grafana.com/tutorials/run-grafana-behind-a-proxy/
 - https://github.com/muutech/zabbix-templates/tree/master/ANDROID
+- https://doc.traefik.io/traefik/v1.6/configuration/logs/#log-rotation
 - https://play.google.com/store/apps/details?id=fr.damongeot.zabbixagent&hl=ru&gl=US
 - https://www.zabbix.com/documentation/5.0/ru/manual/encryption/using_pre_shared_keys
 - https://www.zabbix.com/documentation/5.0/manual/config/items/itemtypes/zabbix_agent/win_keys
