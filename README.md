@@ -98,8 +98,7 @@ docker-compose up -d
 - Enable SNMP and add corresponding IP's
 
 ### UI Links
-Traefik
-- https://traefik.zabbix-web24.duckdns.org
+- https://traefik.zabbix-web24.duckdns.org  (Restricted by IP using Traefik)
 - https://zabbix.zabbix-web24.duckdns.org
 - https://grafana.zabbix-web24.duckdns.org
 - https://mikrotik.zabbix-web24.duckdns.org
