@@ -16,21 +16,22 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.zabbix-web24.duckdns.org`)"
-      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+      - traefik.http.routers.dashboard.rule=Host(`traefik.zabbix-web24.duckdns.org`)
+      - traefik.http.routers.dashboard.tls.certresolver=${CASERVER}
+      - traefik.http.services.dashboard.loadbalancer.server.port=8080
 
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.entrypoints=http,https"
-      - "traefik.http.routers.dashboard.middlewares=secheaders@file"
-      - "traefik.http.routers.dashboard.tls.certresolver=staging"
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.tls=true
+      - traefik.http.routers.dashboard.entrypoints=http,https
+      - traefik.http.routers.dashboard.middlewares=secheaders@file
+
+      # Restricted access by IP
+      - traefik.http.middlewares.traefik-ipwhitelist.ipwhitelist.sourcerange=${IPWHITELIST}
+      - traefik.http.routers.dashboard.middlewares=traefik-auth,traefik-ipwhitelist
 
       # Basic Authentication for Traefik Dashboard
-      # Generate password: sudo apt update && sudo apt install apache2-utils && htpasswd -nb USER PASSWORD
-      # You need to escape all $ sings ($ --> $$)
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.middlewares=traefik-auth"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=Oracle:$$apr1$$l5wr.jVu$$A/jaVwgCmnakAtZcp58IB1"
+      - traefik.http.routers.dashboard.service=api@internal
+      - traefik.http.middlewares.traefik-auth.basicauth.users=${LOGIN}:${PASS_PART_1}${PASS_PART_2}
     healthcheck:
       test: [ "CMD", "wget", "http://localhost:8082/ping","--spider" ]
       interval: 10s
@@ -40,7 +41,6 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      zbx_net_backend:
       zbx_net_frontend:
     restart: always
 
@@ -63,19 +63,20 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-    networks:
-      zbx_net_backend:
-      zbx_net_frontend:
     stop_grace_period: 10s
     sysctls:
       - net.core.somaxconn=65535
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.zabbix.entrypoints=http,https"
-      - "traefik.http.routers.zabbix.rule=Host(`zabbix.zabbix-web24.duckdns.org`)"
-      - "traefik.http.routers.zabbix.tls=true"
-      - "traefik.http.routers.zabbix.tls.certresolver=staging"
-      - "traefik.http.services.zabbix.loadbalancer.server.port=8080"
+      - traefik.http.routers.zabbix.rule=Host(`zabbix.zabbix-web24.duckdns.org`)
+      - traefik.http.routers.zabbix.tls.certresolver=${CASERVER}
+      - traefik.http.services.zabbix.loadbalancer.server.port=8080
+      - traefik.docker.network=zabbix-docker_zbx_net_frontend
+
+      - traefik.enable=true
+      - traefik.http.routers.zabbix.tls=true
+      - traefik.http.routers.zabbix.entrypoints=http,https
+    networks:
+      zbx_net_frontend:
     restart: always
 
   grafana: # optional more functional and creative UI for zabbix
@@ -92,12 +93,14 @@ services:
     depends_on:
       - zabbix-web-nginx-pgsql
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.grafana.entrypoints=http,https"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.zabbix-web24.duckdns.org`)"
-      - "traefik.http.routers.grafana.tls=true"
-      - "traefik.http.routers.grafana.tls.certresolver=staging"
-      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - traefik.http.routers.grafana.rule=Host(`grafana.zabbix-web24.duckdns.org`)
+      - traefik.http.routers.grafana.tls.certresolver=${CASERVER}
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
+      - traefik.docker.network=zabbix-docker_zbx_net_frontend
+
+      - traefik.enable=true
+      - traefik.http.routers.grafana.tls=true
+      - traefik.http.routers.grafana.entrypoints=http,https
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
       interval: 10s
@@ -105,7 +108,6 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      zbx_net_backend:
       zbx_net_frontend:
     restart: always
 
