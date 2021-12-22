@@ -4,3 +4,6 @@ zbx_env*/
 .*CERT_FILE
 .*KEY_FILE
 .*CA_FILE
+.env
+deploy_configs/
+README_secret.md
