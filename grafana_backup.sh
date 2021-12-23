@@ -18,7 +18,7 @@ if [[ -z $task_name || -z $days_to_keep ||  ! "$task_name" =~ ^(daily|monthly|ye
     exit 1
 fi
 
-timestamp=`date +%Y-%m-%d"T"%H%M%S`
+timestamp=$(date +%Y-%m-%d"T"%H%M%S)
 logfile_name="$task_name"_backup.log
 backup_task_path=$backup_dir_name/$task_name
 logfile_path="$backup_task_path/$logfile_name"
@@ -75,7 +75,7 @@ find $backup_task_path/* ! -path $logfile_path -mtime +$days_to_keep |& tee -a $
 find $backup_task_path/* ! -path $logfile_path -mtime +$days_to_keep -delete |& tee -a $logfile_path
 echo "Deletion completed" |& tee -a $logfile_path
 
-timestamp=`date +%Y-%m-%d"T"%H%M%S`
+timestamp=$(date +%Y-%m-%d"T"%H%M%S)
 echo "Backup was ended at: "$timestamp |& tee -a $logfile_path
 echo |& tee -a $logfile_path  # A newline at the end of the file.
 
