@@ -1,0 +1,10 @@
+[Unit]
+Description=zabbix_postgres_daily_backup timer
+
+[Timer]
+OnCalendar=daily
+AccuracySec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target
