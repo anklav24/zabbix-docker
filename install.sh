@@ -10,7 +10,7 @@ echo
 echo "------Install programs (Optional)------"
 echo
 
-sudo apt install -y mc ncdu
+sudo apt install -y mc ncdu lnav tree
 
 echo
 echo "------Install docker------"
