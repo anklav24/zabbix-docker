@@ -8,3 +8,4 @@ zbx_env*/
 deploy_configs/
 README_secret.md
 grafana_backup/
+zabbix_postgres_backup/
