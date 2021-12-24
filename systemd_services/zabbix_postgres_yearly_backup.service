@@ -1,0 +1,15 @@
+[Unit]
+Description=zabbix_postgres_yearly_backup
+After=network.target
+
+[Service]
+Type=oneshot
+
+User=root
+Group=root
+
+WorkingDirectory=/home/ubuntu/zabbix-docker
+ExecStart=/home/ubuntu/zabbix-docker/zabbix_postgres_backup.sh yearly 365 zabbix zabbix debug
+
+[Install]
+WantedBy=multi-user.target

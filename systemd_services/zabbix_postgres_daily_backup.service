@@ -1,0 +1,15 @@
+[Unit]
+Description=zabbix_postgres_daily_backup
+After=network.target
+
+[Service]
+Type=oneshot
+
+User=root
+Group=root
+
+WorkingDirectory=/home/ubuntu/zabbix-docker
+ExecStart=/home/ubuntu/zabbix-docker/zabbix_postgres_backup.sh daily 7 zabbix zabbix debug
+
+[Install]
+WantedBy=multi-user.target

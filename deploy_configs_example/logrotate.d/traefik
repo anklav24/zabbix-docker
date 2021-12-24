@@ -1,0 +1,9 @@
+/var/log/traefik/*.log {
+  weekly
+  rotate 4
+  missingok
+  notifempty
+  postrotate
+    docker kill --signal="USR1" YOUR_CONTAINER_NAME
+  endscript
+}

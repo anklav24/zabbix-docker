@@ -1,10 +1,13 @@
-# Zabbix, PostgreSQL, Grafana, Traefik (TLS, HTTPS)
+# Zabbix, PostgreSQL, Grafana, Traefik (TLS, HTTPS), Backup (Local and Google Drive)
+
+## Overview
+If you need your own zabbix server with HTTPS and Backups.
 
 ## Tested
-- 2021-10-29
+- 2021-12-24
 
 ## Requirements
-- Oracle VPS Free Tier (VM.Standard.E2.1.Micro)
+- Oracle VPS Free Tier (VM.Standard.E2.1.Micro) In my case 2 CPU, 1GB RAM, 2GB SWAP, 50GB HDD
 - Ubuntu 20.04
 
 ## Version
@@ -13,28 +16,32 @@
 - Grafana 8.2.0
 - Traefik 2.5.3
 
-## Clone the repository
+## Installation
+### Clone the repository
 ```bash
 cd ~ &&
 git clone https://github.com/anklav24/zabbix-docker &&
 cd zabbix-docker
 ```
 
-## Select a develop branch (Optional)
+### Select a develop branch (Optional)
 ```bash
 git checkout develop
 ```
 
-## Check ```deploy_configs``` and ```*-docker-compose.yaml```
-Replace domains, envs, emails, logins, passwords and tls.certresolver on yours!
+### Rename ```deploy_configs_example```, ```.env.example```
+- ```deploy_configs_example``` -> ```deploy_configs```
+- ```.env.example``` -> ```.env```
 
-## Install
-Docker, Docker-compose and other stuff.
+### Check ```deploy_configs``` and ```*-docker-compose.yaml```
+  Replace domains, envs, emails, logins, passwords and tls.certresolver on yours!
+
+### Install Docker, Docker-compose and other stuff.
 ```bash
 chmod +x install.sh && ./install.sh
 ```
 
-## Run compose files
+### Run compose files
 For a split config, use one of these two commands on the two servers:
 ```bash
 cd ~/zabbix-docker
@@ -47,6 +54,58 @@ docker-compose -f zabbix-web-docker-compose.yaml up -d
 If you have one powerfull VPS use:
 ```bash
 docker-compose up -d
+```
+
+### Install gdrive as root user
+- https://github.com/prasmussen/gdrive
+- Find folder_id
+```bash
+# Example
+gdrive list --absolute --query "mimeType = 'application/vnd.google-apps.folder' and name contains 'backup'" --max 1000
+```
+- Change in `grafana_backup.sh` and `zabbix_postgres_backup.sh` `gdrive_folder_id` variable to your `Id`
+
+### Setup Systemd service
+Set up backup automation:
+```bash
+sudo cp systemd_services/* /etc/systemd/system/  # Copy services and timers files.
+sudo systemctl start grafana_montly_backup.service  # Check the service works properly (Example)
+sudo systemctl enable grafana_montly_backup.timer  # Enable a timer (Example)
+```
+```bash
+sudo systemctl daemon-reload  # Reload systemd after service changing.
+clear; sudo systemctl status *4sou*timer  # Check backup timers
+sudo systemctl list-timers  # Check all timers
+sudo systemctl list-unit-files *backup*.timer  # Check if timers are enabled
+
+journalctl -u grafana_daily_backup.timer  # Check logs
+journalctl -u grafana_daily_backup.service  # Check logs
+```
+```bash
+sudo systemctl start grafana_daily_backup.service  # Start the backup manually.
+sudo systemctl start grafana_monthly_backup.service  # Start the backup manually.
+sudo systemctl start grafana_yearly_backup.service  # Start the backup manually. With Google Drive Sync
+
+sudo systemctl start grafana_daily_backup.timer
+sudo systemctl start grafana_monthly_backup.timer
+sudo systemctl start grafana_yearly_backup.timer
+
+sudo systemctl enable grafana_daily_backup.timer
+sudo systemctl enable grafana_monthly_backup.timer
+sudo systemctl enable grafana_yearly_backup.timer
+```
+```bash
+sudo systemctl start zabbix_postgres_daily_backup.service  # Start the backup manually.
+sudo systemctl start zabbix_postgres_monthly_backup.service  # Start the backup manually.
+sudo systemctl start zabbix_postgres_yearly_backup.service  # Start the backup manually. With Google Drive Sync
+
+sudo systemctl start zabbix_postgres_daily_backup.timer
+sudo systemctl start zabbix_postgres_monthly_backup.timer
+sudo systemctl start zabbix_postgres_yearly_backup.timer
+
+sudo systemctl enable zabbix_postgres_daily_backup.timer
+sudo systemctl enable zabbix_postgres_monthly_backup.timer
+sudo systemctl enable zabbix_postgres_yearly_backup.timer
 ```
 
 ### Grafana
@@ -97,20 +156,24 @@ docker-compose up -d
 ### Mikrotik SNMP
 - Enable SNMP and add corresponding IP's
 
-### UI Links
-Traefik
-- https://traefik.zabbix-web24.duckdns.org
+## Traefik
+- Setup `logrotate` check config in `deploy_configs/logrotate.d/traefik`
+- Or turn off logs
+
+## UI Links
+- https://traefik.zabbix-web24.duckdns.org  (Restricted by IP using Traefik)
 - https://zabbix.zabbix-web24.duckdns.org
 - https://grafana.zabbix-web24.duckdns.org
 - https://mikrotik.zabbix-web24.duckdns.org
 
-### References
+## References
 - https://www.duckdns.org/
 - https://ssllabs.com/ssltest
 - https://hstspreload.org/
 - https://doc.traefik.io/traefik/
 - https://grafana.com/tutorials/run-grafana-behind-a-proxy/
 - https://github.com/muutech/zabbix-templates/tree/master/ANDROID
+- https://doc.traefik.io/traefik/v1.6/configuration/logs/#log-rotation
 - https://play.google.com/store/apps/details?id=fr.damongeot.zabbixagent&hl=ru&gl=US
 - https://www.zabbix.com/documentation/5.0/ru/manual/encryption/using_pre_shared_keys
 - https://www.zabbix.com/documentation/5.0/manual/config/items/itemtypes/zabbix_agent/win_keys
