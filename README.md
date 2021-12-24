@@ -1,6 +1,6 @@
 # Zabbix, PostgreSQL, Grafana, Traefik (TLS, HTTPS), Backup (Local and Google Drive)
 
-Overview
+## Overview
 If you need your own zabbix server with HTTPS and Backups.
 
 ## Tested
@@ -156,17 +156,17 @@ sudo systemctl enable zabbix_postgres_yearly_backup.timer
 ### Mikrotik SNMP
 - Enable SNMP and add corresponding IP's
 
-### Traefik
+## Traefik
 - Setup `logrotate` check config in `deploy_configs/logrotate.d/traefik`
 - Or turn off logs
 
-### UI Links
+## UI Links
 - https://traefik.zabbix-web24.duckdns.org  (Restricted by IP using Traefik)
 - https://zabbix.zabbix-web24.duckdns.org
 - https://grafana.zabbix-web24.duckdns.org
 - https://mikrotik.zabbix-web24.duckdns.org
 
-### References
+## References
 - https://www.duckdns.org/
 - https://ssllabs.com/ssltest
 - https://hstspreload.org/
