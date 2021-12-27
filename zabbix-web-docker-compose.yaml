@@ -52,6 +52,7 @@ services:
     mem_reservation: 256M
 
     volumes:
+      - ./deploy_configs/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
       - /etc/localtime:/etc/localtime:ro
       - ./zbx_env/etc/ssl/nginx:/etc/ssl/nginx:ro
       - ./zbx_env/usr/share/zabbix/modules/:/usr/share/zabbix/modules/:ro
@@ -72,6 +73,13 @@ services:
       - traefik.http.routers.zabbix.tls.certresolver=${CASERVER}
       - traefik.http.services.zabbix.loadbalancer.server.port=8080
       - traefik.docker.network=zabbix-docker_zbx_net_frontend
+
+      # Restricted access by IP
+      - traefik.http.routers.nginx_status.rule=(Host(`zabbix.zabbix-web24.duckdns.org`) && PathPrefix(`/basic_status`))
+      - traefik.http.routers.nginx_status.entrypoints=http,https
+      - traefik.http.routers.nginx_status.tls=true
+      - traefik.http.middlewares.nginx_status.ipwhitelist.sourcerange=${IPWHITELIST}
+      - traefik.http.routers.nginx_status.middlewares=nginx_status
 
       - traefik.enable=true
       - traefik.http.routers.zabbix.tls=true

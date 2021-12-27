@@ -108,7 +108,7 @@ sudo systemctl enable zabbix_postgres_monthly_backup.timer
 sudo systemctl enable zabbix_postgres_yearly_backup.timer
 ```
 
-### Grafana
+## Grafana
 - PostgeSQL
   - Configuration
     - Configuration - Data sources - Add data source - PostgreSQL
