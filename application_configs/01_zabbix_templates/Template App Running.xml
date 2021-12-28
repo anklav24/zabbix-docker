@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-12-28T17:25:16Z</date>
+    <groups>
+        <group>
+            <name>Templates/Applications</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template App Running</template>
+            <name>Template App Running</name>
+            <groups>
+                <group>
+                    <name>Templates/Applications</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Apps</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>notepad.exe</name>
+                    <key>proc.num[notepad.exe]</key>
+                    <delay>1s</delay>
+                    <applications>
+                        <application>
+                            <name>Apps</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;1</expression>
+                            <name>Too much notepad.exe</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <tags>
+                <tag>
+                    <tag>Custom</tag>
+                </tag>
+            </tags>
+        </template>
+    </templates>
+</zabbix_export>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-10-21T13:36:25Z</date>
+    <date>2021-12-28T17:25:03Z</date>
     <groups>
         <group>
-            <name>Windows</name>
+            <name>Templates/Operating systems</name>
         </group>
     </groups>
     <templates>
@@ -13,12 +13,12 @@
             <name>Template Windows Event Viewer Logs</name>
             <groups>
                 <group>
-                    <name>Windows</name>
+                    <name>Templates/Operating systems</name>
                 </group>
             </groups>
             <applications>
                 <application>
-                    <name>Logs</name>
+                    <name>Event Viewer</name>
                 </application>
             </applications>
             <items>
@@ -26,59 +26,98 @@
                     <name>Application</name>
                     <type>ZABBIX_ACTIVE</type>
                     <key>eventlog[Application,,&quot;Warning|Error|Critical&quot;,,,,skip]</key>
-                    <delay>1s</delay>
-                    <history>3d</history>
+                    <delay>5s</delay>
                     <trends>0</trends>
                     <value_type>LOG</value_type>
                     <applications>
                         <application>
-                            <name>Logs</name>
+                            <name>Event Viewer</name>
                         </application>
                     </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>.*
+\0</params>
+                        </step>
+                    </preprocessing>
                 </item>
                 <item>
                     <name>Security</name>
                     <type>ZABBIX_ACTIVE</type>
                     <key>eventlog[Security,,&quot;Failure Audit&quot;,,,,skip]</key>
-                    <delay>1s</delay>
-                    <history>3d</history>
+                    <delay>5s</delay>
                     <trends>0</trends>
                     <value_type>LOG</value_type>
                     <applications>
                         <application>
-                            <name>Logs</name>
+                            <name>Event Viewer</name>
                         </application>
                     </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>.*
+\0</params>
+                        </step>
+                    </preprocessing>
+                    <triggers>
+                        <trigger>
+                            <expression>{count(1m)}&gt;0</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{nodata(10m)}=1</recovery_expression>
+                            <name>Event Viewer</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
                 </item>
                 <item>
                     <name>Setup</name>
                     <type>ZABBIX_ACTIVE</type>
                     <key>eventlog[Setup,,&quot;Warning|Error|Critical&quot;,,,,skip]</key>
-                    <delay>1s</delay>
-                    <history>3d</history>
+                    <delay>5s</delay>
                     <trends>0</trends>
                     <value_type>LOG</value_type>
                     <applications>
                         <application>
-                            <name>Logs</name>
+                            <name>Event Viewer</name>
                         </application>
                     </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>.*
+\0</params>
+                        </step>
+                    </preprocessing>
                 </item>
                 <item>
                     <name>System</name>
                     <type>ZABBIX_ACTIVE</type>
                     <key>eventlog[System,,&quot;Warning|Error|Critical&quot;,,,,skip]</key>
-                    <delay>1s</delay>
-                    <history>3d</history>
+                    <delay>5s</delay>
                     <trends>0</trends>
                     <value_type>LOG</value_type>
                     <applications>
                         <application>
-                            <name>Logs</name>
+                            <name>Event Viewer</name>
                         </application>
                     </applications>
+                    <preprocessing>
+                        <step>
+                            <type>REGEX</type>
+                            <params>.*
+\0</params>
+                        </step>
+                    </preprocessing>
                 </item>
             </items>
+            <tags>
+                <tag>
+                    <tag>Custom</tag>
+                </tag>
+            </tags>
         </template>
     </templates>
 </zabbix_export>
