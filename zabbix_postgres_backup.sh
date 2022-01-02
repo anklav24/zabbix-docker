@@ -42,7 +42,7 @@ fi
 mkdir --parents $backup_path_timestamp
 
 echo "$task_name backup has started: $timestamp" |& tee -a $logfile_path
- Zabbix DB backup
+# Zabbix DB backup
 echo "Postgress..." |& tee -a $logfile_path
 docker exec $db_docker_name pg_dump -U $postgress_user $postgress_password \
 | gzip -9 > "$backup_path_timestamp/postgress_$timestamp.sql.gz" \
