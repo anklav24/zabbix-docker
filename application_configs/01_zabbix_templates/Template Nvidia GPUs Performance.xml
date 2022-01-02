@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2022-01-02T00:24:06Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+        <group>
+            <name>Templates/Operating systems</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template Nvidia GPUs Performance</template>
+            <name>Template Nvidia GPUs Performance</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+                <group>
+                    <name>Templates/Operating systems</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Nvidia GPUs</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Number of GPUs</name>
+                    <key>gpu.number</key>
+                    <delay>5s</delay>
+                    <value_type>FLOAT</value_type>
+                    <description>The number of GPUs present on this system.</description>
+                    <applications>
+                        <application>
+                            <name>Nvidia GPUs</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{diff()}=1</expression>
+                            <name>Number of GPUs has changed {ITEM.VALUE}</name>
+                            <priority>HIGH</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>GPU discovery</name>
+                    <key>gpu.discovery</key>
+                    <delay>1h</delay>
+                    <description>Discovery of graphics cards.</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Fan Speed</name>
+                            <key>gpu.fanspeed[{#GPUINDEX}]</key>
+                            <delay>5s</delay>
+                            <history>7d</history>
+                            <units>%</units>
+                            <applications>
+                                <application>
+                                    <name>Nvidia GPUs</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{avg(10s)}&lt;{$FAN_SPEED_MIN_GPU:&quot;{#GPUMODEL}&quot;}&#13;
+or&#13;
+{avg(10s)}&gt;{$FAN_SPEED_MAX_GPU:&quot;{#GPUMODEL}&quot;}</expression>
+                                    <name>GPU {#GPUINDEX}: {#GPUMODEL} {$FAN_SPEED_MIN_GPU:&quot;{#GPUMODEL}&quot;}% &gt; Fan Speed &gt; {$FAN_SPEED_MAX_GPU:&quot;{#GPUMODEL}&quot;}%</name>
+                                    <priority>AVERAGE</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Memory Free</name>
+                            <key>gpu.memfree[{#GPUINDEX}]</key>
+                            <delay>5s</delay>
+                            <history>7d</history>
+                            <units>b</units>
+                            <applications>
+                                <application>
+                                    <name>Nvidia GPUs</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1000000</params>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{avg(5m)}&lt;{$MEMORY_FREE_GPU:&quot;{#GPUMODEL}&quot;}</expression>
+                                    <name>GPU {#GPUINDEX}: {#GPUMODEL} Memory Free &lt; {$MEMORY_FREE_GPU:&quot;{#GPUMODEL}&quot;}</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Memory Total</name>
+                            <key>gpu.memtotal[{#GPUINDEX}]</key>
+                            <delay>5s</delay>
+                            <history>7d</history>
+                            <units>b</units>
+                            <applications>
+                                <application>
+                                    <name>Nvidia GPUs</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1000000</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Memory Used</name>
+                            <key>gpu.memused[{#GPUINDEX}]</key>
+                            <delay>5s</delay>
+                            <history>7d</history>
+                            <units>b</units>
+                            <applications>
+                                <application>
+                                    <name>Nvidia GPUs</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>1000000</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Power in Watts</name>
+                            <key>gpu.power[{#GPUINDEX}]</key>
+                            <delay>5s</delay>
+                            <history>7d</history>
+                            <value_type>FLOAT</value_type>
+                            <units>W</units>
+                            <applications>
+                                <application>
+                                    <name>Nvidia GPUs</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{avg(5m)}&lt;{$POWER_MIN_GPU:&quot;{#GPUMODEL}&quot;}&#13;
+or&#13;
+{last()}&gt;{$POWER_MAX_GPU:&quot;{#GPUMODEL}&quot;}</expression>
+                                    <name>GPU {#GPUINDEX}: {#GPUMODEL} {$POWER_MIN_GPU:&quot;{#GPUMODEL}&quot;}W &gt; Power in Watts &gt; {$POWER_MAX_GPU:&quot;{#GPUMODEL}&quot;}W</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Temperature</name>
+                            <key>gpu.temp[{#GPUINDEX}]</key>
+                            <delay>5s</delay>
+                            <history>7d</history>
+                            <value_type>FLOAT</value_type>
+                            <units>C</units>
+                            <applications>
+                                <application>
+                                    <name>Nvidia GPUs</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&gt;{$TEMP_CRIT:&quot;GPU&quot;}</expression>
+                                    <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                                    <recovery_expression>{avg(5m)}&lt;{$TEMP_CRIT:&quot;GPU&quot;}</recovery_expression>
+                                    <name>GPU {#GPUINDEX}: {#GPUMODEL} Temperature is extremely high</name>
+                                    <priority>DISASTER</priority>
+                                    <description>A GPU's temperature is getting extremely high!</description>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}&gt;{$TEMP_WARN:&quot;GPU&quot;}</expression>
+                                    <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                                    <recovery_expression>{avg(5m)}&lt;{$TEMP_WARN:&quot;GPU&quot;}</recovery_expression>
+                                    <name>GPU {#GPUINDEX}: {#GPUMODEL} Temperature is high</name>
+                                    <priority>WARNING</priority>
+                                    <description>A GPU's temperature is getting high!</description>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Temperature is very high</name>
+                                            <expression>{Template Nvidia GPUs Performance:gpu.temp[{#GPUINDEX}].last()}&gt;{$TEMP_HIGH:&quot;GPU&quot;}</expression>
+                                            <recovery_expression>{Template Nvidia GPUs Performance:gpu.temp[{#GPUINDEX}].avg(5m)}&lt;{$TEMP_HIGH:&quot;GPU&quot;}</recovery_expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}&gt;{$TEMP_HIGH:&quot;GPU&quot;}</expression>
+                                    <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                                    <recovery_expression>{avg(5m)}&lt;{$TEMP_HIGH:&quot;GPU&quot;}</recovery_expression>
+                                    <name>GPU {#GPUINDEX}: {#GPUMODEL} Temperature is very high</name>
+                                    <priority>HIGH</priority>
+                                    <description>A GPU's temperature is getting very high!</description>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Temperature is extremely high</name>
+                                            <expression>{Template Nvidia GPUs Performance:gpu.temp[{#GPUINDEX}].last()}&gt;{$TEMP_CRIT:&quot;GPU&quot;}</expression>
+                                            <recovery_expression>{Template Nvidia GPUs Performance:gpu.temp[{#GPUINDEX}].avg(5m)}&lt;{$TEMP_CRIT:&quot;GPU&quot;}</recovery_expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Utilization</name>
+                            <key>gpu.utilization[{#GPUINDEX}]</key>
+                            <delay>5s</delay>
+                            <history>7d</history>
+                            <units>%</units>
+                            <applications>
+                                <application>
+                                    <name>Nvidia GPUs</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{avg(5m)}&lt;{$UTILIZATION:&quot;GPU&quot;}</expression>
+                                    <name>GPU {#GPUINDEX}: {#GPUMODEL} Utilization &lt; {$UTILIZATION:&quot;GPU&quot;}%</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Memory</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>00AA00</color>
+                                    <item>
+                                        <host>Template Nvidia GPUs Performance</host>
+                                        <key>gpu.memfree[{#GPUINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>0000DD</color>
+                                    <item>
+                                        <host>Template Nvidia GPUs Performance</host>
+                                        <key>gpu.memused[{#GPUINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Temperature, Fan Speed and Power</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Template Nvidia GPUs Performance</host>
+                                        <key>gpu.power[{#GPUINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Template Nvidia GPUs Performance</host>
+                                        <key>gpu.fanspeed[{#GPUINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Template Nvidia GPUs Performance</host>
+                                        <key>gpu.temp[{#GPUINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>GPU {#GPUINDEX}: {#GPUMODEL} Utilization</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Template Nvidia GPUs Performance</host>
+                                        <key>gpu.utilization[{#GPUINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+            </discovery_rules>
+            <tags>
+                <tag>
+                    <tag>Custom</tag>
+                </tag>
+            </tags>
+            <macros>
+                <macro>
+                    <macro>{$FAN_SPEED_MAX_GPU}</macro>
+                    <value>40</value>
+                    <description>% Use custom macros with context on the host if you want to set parameters differently for each GPU individually.</description>
+                </macro>
+                <macro>
+                    <macro>{$FAN_SPEED_MIN_GPU}</macro>
+                    <value>20</value>
+                    <description>% Use custom macros with context on the host if you want to set parameters differently for each GPU individually.</description>
+                </macro>
+                <macro>
+                    <macro>{$MEMORY_FREE_GPU}</macro>
+                    <value>1G</value>
+                    <description>G Use custom macros with context on the host if you want to set parameters differently for each GPU individually.</description>
+                </macro>
+                <macro>
+                    <macro>{$POWER_MAX_GPU}</macro>
+                    <value>140</value>
+                    <description>W Use custom macros with context on the host if you want to set parameters differently for each GPU individually. Example: {$POWER_MAX_GPU:&quot;NVIDIA GeForce RTX 2060 SUPER&quot;}</description>
+                </macro>
+                <macro>
+                    <macro>{$POWER_MIN_GPU}</macro>
+                    <value>100</value>
+                    <description>W Use custom macros with context on the host if you want to set parameters differently for each GPU individually. Example: {$POWER_MAX_GPU:&quot;NVIDIA GeForce RTX 2060 SUPER&quot;}</description>
+                </macro>
+                <macro>
+                    <macro>{$TEMP_CRIT:&quot;GPU&quot;}</macro>
+                    <value>80</value>
+                    <description>C</description>
+                </macro>
+                <macro>
+                    <macro>{$TEMP_HIGH:&quot;GPU&quot;}</macro>
+                    <value>75</value>
+                    <description>C</description>
+                </macro>
+                <macro>
+                    <macro>{$TEMP_WARN:&quot;GPU&quot;}</macro>
+                    <value>70</value>
+                    <description>C</description>
+                </macro>
+                <macro>
+                    <macro>{$UTILIZATION:&quot;GPU&quot;}</macro>
+                    <value>70</value>
+                    <description>%</description>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>

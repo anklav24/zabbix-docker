@@ -17,6 +17,14 @@ FOR /F "tokens=* USEBACKQ" %%F IN (`"C:\Windows\System32\nvidia-smi.exe" -L`) DO
             echo|set /p=%%B", "
         )
     )
+    for /f "tokens=1 delims=(" %%A in ('echo %%F') do (
+        for /f "tokens=2 delims=:" %%B in ('echo %%A') do (
+            set model=%%B
+            set model=!model:~0,-1!
+            echo|set /p="{#GPUMODEL}":""
+            echo|set /p=!model!", "
+        )
+    )
     for /f "tokens=3 delims=:" %%A in ('echo %%F') do (
         echo|set /p={#GPUUUID}":"
         for /f "tokens=1 delims= " %%B in ('echo %%A') do (

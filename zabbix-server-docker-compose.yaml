@@ -65,7 +65,7 @@ services:
     restart: always
 
   postgres-server:
-    image: postgres:12  # Поменять на ubuntu?
+    image: postgres:12
 
     cpu_quota: 70000  # 1000 = 1%
     mem_reservation: 256M
