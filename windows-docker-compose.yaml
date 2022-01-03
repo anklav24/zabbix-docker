@@ -1,0 +1,237 @@
+# Try a new 5.4 version
+version: '2.4'
+
+services:
+  zabbix-server:
+    image: zabbix/zabbix-server-pgsql:ubuntu-5.4.9
+
+    cpu_quota: 30000  # 1000 = 1%
+    mem_reservation: 256M
+
+    ports:
+      - "10051:10051"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./zbx_env/usr/lib/zabbix/alertscripts:/usr/lib/zabbix/alertscripts:ro
+      - ./zbx_env/usr/lib/zabbix/externalscripts:/usr/lib/zabbix/externalscripts:ro
+      - ./zbx_env/var/lib/zabbix/export:/var/lib/zabbix/export:rw
+      - ./zbx_env/var/lib/zabbix/modules:/var/lib/zabbix/modules:ro
+      - ./zbx_env/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
+      - ./zbx_env/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
+      - ./zbx_env/var/lib/zabbix/mibs:/var/lib/zabbix/mibs:ro
+      - ./zbx_env/var/lib/zabbix/snmptraps:/var/lib/zabbix/snmptraps:ro
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    env_file:
+      - ./deploy_configs/env_vars/.env_db_pgsql
+      - ./deploy_configs/env_vars/.env_srv
+    depends_on:
+      - postgres-server
+    networks:
+      zbx_net_backend:
+    stop_grace_period: 30s
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65000
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
+    restart: always
+
+  zabbix-agent:
+    image: zabbix/zabbix-agent:ubuntu-5.4.9
+
+    cpu_quota: 10000  # 1000 = 1%
+    mem_reservation: 8M
+
+    ports:
+      - "10050:10050"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./zbx_env/etc/zabbix/zabbix_agentd.d:/etc/zabbix/zabbix_agentd.d:ro
+      - ./zbx_env/var/lib/zabbix/modules:/var/lib/zabbix/modules:ro
+      - ./zbx_env/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
+      - ./zbx_env/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
+    env_file:
+      - ./deploy_configs/env_vars/.env_agent
+    privileged: true
+    pid: "host"
+    networks:
+      zbx_net_backend:
+        aliases:
+          - zabbix-server-agent
+    stop_grace_period: 5s
+    restart: always
+
+  postgres-server:
+    image: postgres:13
+
+    cpu_quota: 70000  # 1000 = 1%
+    mem_reservation: 256M
+
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
+    env_file:
+      - ./deploy_configs/env_vars/.env_db_pgsql
+    command: -c 'max_connections=200'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    stop_grace_period: 1m
+    networks:
+      zbx_net_backend:
+    restart: always
+
+  traefik:
+    image: traefik:v2.5.3
+
+    cpu_quota: 10000  # 1000 = 1%
+    mem_reservation: 64M
+
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - traefik-ssl-certs:/ssl-certs
+      - /var/log/traefik:/var/log/traefik
+      - ./deploy_configs/traefik/:/etc/traefik/
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.http.routers.dashboard.rule=Host(`traefik.zabbix-web24.duckdns.org`)
+      - traefik.http.routers.dashboard.tls.certresolver=${CASERVER}
+      - traefik.http.services.dashboard.loadbalancer.server.port=8080
+
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.tls=true
+      - traefik.http.routers.dashboard.entrypoints=http,https
+      - traefik.http.routers.dashboard.middlewares=secheaders@file
+
+      # Restricted access by IP
+      - traefik.http.middlewares.traefik-ipwhitelist.ipwhitelist.sourcerange=${IPWHITELIST}
+      - traefik.http.routers.dashboard.middlewares=traefik-auth,traefik-ipwhitelist
+
+      # Basic Authentication for Traefik Dashboard
+      - traefik.http.routers.dashboard.service=api@internal
+      - traefik.http.middlewares.traefik-auth.basicauth.users=${LOGIN}:${PASS_PART_1}${PASS_PART_2}
+    healthcheck:
+      test: [ "CMD", "wget", "http://localhost:8082/ping","--spider" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      zbx_net_frontend:
+    restart: always
+
+  zabbix-web-nginx-pgsql:
+    image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.4.9
+
+    cpu_quota: 90000  # 1000 = 1%
+    mem_reservation: 256M
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - ./deploy_configs/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - /etc/localtime:/etc/localtime:ro
+      - ./zbx_env/etc/ssl/nginx:/etc/ssl/nginx:ro
+      - ./zbx_env/usr/share/zabbix/modules/:/usr/share/zabbix/modules/:ro
+    env_file:
+      - deploy_configs/env_vars/.env_db_pgsql
+      - deploy_configs/env_vars/.env_web
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    stop_grace_period: 10s
+    sysctls:
+      - net.core.somaxconn=65535
+    labels:
+      - traefik.http.routers.zabbix.rule=Host(`zabbix.zabbix-web24.duckdns.org`)
+      - traefik.http.routers.zabbix.tls.certresolver=${CASERVER}
+      - traefik.http.services.zabbix.loadbalancer.server.port=8080
+      - traefik.docker.network=zabbix-docker_zbx_net_frontend
+
+      # Restricted access by IP
+      - traefik.http.routers.nginx_status.rule=(Host(`zabbix.zabbix-web24.duckdns.org`) && PathPrefix(`/basic_status`))
+      - traefik.http.routers.nginx_status.entrypoints=http,https
+      - traefik.http.routers.nginx_status.tls=true
+      - traefik.http.middlewares.nginx_status.ipwhitelist.sourcerange=${IPWHITELIST}
+      - traefik.http.routers.nginx_status.middlewares=nginx_status
+
+      - traefik.enable=true
+      - traefik.http.routers.zabbix.tls=true
+      - traefik.http.routers.zabbix.entrypoints=http,https
+    networks:
+      zbx_net_frontend:
+      zbx_net_backend:
+    restart: always
+
+  grafana: # optional more functional and creative UI for zabbix
+    image: grafana/grafana:8.2.0-ubuntu
+
+    cpu_quota: 80000  # 1000 = 1%
+    mem_reservation: 128M
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - grafana_storage:/var/lib/grafana
+      - ./deploy_configs/grafana/grafana.ini:/etc/grafana/grafana.ini
+    env_file:
+      - ./deploy_configs/grafana/.env_grafana
+    depends_on:
+      - zabbix-web-nginx-pgsql
+    labels:
+      - traefik.http.routers.grafana.rule=Host(`grafana.zabbix-web24.duckdns.org`)
+      - traefik.http.routers.grafana.tls.certresolver=${CASERVER}
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
+      - traefik.docker.network=zabbix-docker_zbx_net_frontend
+
+      - traefik.enable=true
+      - traefik.http.routers.grafana.tls=true
+      - traefik.http.routers.grafana.entrypoints=http,https
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      zbx_net_frontend:
+    restart: always
+
+networks:
+  zbx_net_frontend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+  zbx_net_backend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.239.0/24
+
+volumes:  # Persistent data
+  grafana_storage:
+  traefik-ssl-certs:
