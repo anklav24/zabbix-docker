@@ -2,8 +2,8 @@
 
 task_name=$1
 days_to_keep=$2
-postgress_user=$3
-postgress_password=$4
+postgres_user=$3
+postgres_password=$4
 debug=$5
 
 db_docker_name=zabbix-docker-postgres-server-1
@@ -12,10 +12,10 @@ backup_dir_name=./zabbix_postgres_backup
 combine_file_name=zabbix
 gdrive_folder_id=1dBFaF8Li96hVlH5UIOCnraxY4Nh7whYf
 
-keep_log_lines=20
+keep_log_lines=300
 
-if [[ -z $task_name || -z $days_to_keep || -z $postgress_user || -z $postgress_password ||  ! "$task_name" =~ ^(daily|monthly|yearly)$ ]]; then
-    echo "Need args: task_name (daily, monthly, yearly), days_to_keep (7, 186, 365), postgress_user, postgress_password, [debug (true)]"
+if [[ -z $task_name || -z $days_to_keep || -z $postgres_user || -z $postgres_password ||  ! "$task_name" =~ ^(daily|monthly|yearly)$ ]]; then
+    echo "Need args: task_name (daily, monthly, yearly), days_to_keep (7, 186, 365), postgres_user, postgres_password, [debug (true)]"
     echo "In cron: daily 7 copies, monthly 6 copies, yearly 1 copies"
     exit 1
 fi
@@ -43,9 +43,9 @@ mkdir --parents $backup_path_timestamp
 
 echo "$task_name backup has started: $timestamp" |& tee -a $logfile_path
 # Zabbix DB backup
-echo "Postgress..." |& tee -a $logfile_path
-docker exec $db_docker_name pg_dump -U $postgress_user $postgress_password \
-| gzip -9 > "$backup_path_timestamp/postgress_$timestamp.sql.gz" \
+echo "postgres..." |& tee -a $logfile_path
+docker exec $db_docker_name pg_dump -U $postgres_user $postgres_password \
+| gzip -9 > "$backup_path_timestamp/postgres_$timestamp.sql.gz" \
 |& tee -a $logfile_path
 
 # Env and settings files backup
@@ -56,7 +56,7 @@ tar -czf "$backup_path_timestamp/config_$timestamp.tar.gz" $config_source_dir .e
 # Combine files
 echo "Combine it into one file..." |& tee -a $logfile_path
 tar -cf "$backup_task_path"/"$combine_file_name"_"$timestamp.tar" \
-"$backup_path_timestamp/postgress_$timestamp.sql.gz" \
+"$backup_path_timestamp/postgres_$timestamp.sql.gz" \
 "$backup_path_timestamp/config_$timestamp.tar.gz"
 rm -rf $backup_path_timestamp
 
