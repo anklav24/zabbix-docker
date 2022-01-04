@@ -48,7 +48,7 @@ services:
   zabbix-web-nginx-pgsql:
     image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.0.16
 
-    cpu_quota: 90000  # 1000 = 1%
+    cpu_quota: 95000  # 1000 = 1%
     mem_reservation: 256M
 
     volumes:

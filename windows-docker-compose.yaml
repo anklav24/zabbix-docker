@@ -1,9 +1,8 @@
-# Try a new 5.4 version
 version: '2.4'
 
 services:
   zabbix-server:
-    image: zabbix/zabbix-server-pgsql:ubuntu-5.4.9
+    image: zabbix/zabbix-server-pgsql:ubuntu-5.0.16
 
     cpu_quota: 30000  # 1000 = 1%
     mem_reservation: 256M
@@ -41,7 +40,7 @@ services:
     restart: always
 
   zabbix-agent:
-    image: zabbix/zabbix-agent:ubuntu-5.4.9
+    image: zabbix/zabbix-agent:ubuntu-5.0.16
 
     cpu_quota: 10000  # 1000 = 1%
     mem_reservation: 8M
@@ -66,7 +65,7 @@ services:
     restart: always
 
   postgres-server:
-    image: postgres:13
+    image: timescale/timescaledb:2.5.1-pg12
 
     cpu_quota: 70000  # 1000 = 1%
     mem_reservation: 256M
@@ -134,7 +133,7 @@ services:
     restart: always
 
   zabbix-web-nginx-pgsql:
-    image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.4.9
+    image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.0.16
 
     cpu_quota: 90000  # 1000 = 1%
     mem_reservation: 256M

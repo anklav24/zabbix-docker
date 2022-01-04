@@ -1,4 +1,4 @@
-# Zabbix, PostgreSQL, Grafana, Traefik (TLS, HTTPS), Backup (Local and Google Drive)
+# Zabbix, PostgreSQL (Timescale DB), Grafana, Traefik (TLS, HTTPS), Backup (Local and Google Drive)
 
 ## Overview
 
@@ -69,6 +69,11 @@ If you have one powerful VPS use:
 
 ```bash
 docker-compose up -d
+```
+
+### Copy postgres config at the end of file
+```bash
+deploy_configs_example/postgres/postgres.conf -> zbx_env/var/lib/postgresql/data/postgresql.conf
 ```
 
 ### Install gdrive as root user
