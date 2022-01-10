@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2022-01-10T18:19:14Z</date>
+    <groups>
+        <group>
+            <name>Mining</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template NiceHash QuickMiner Excavator API by Zabbix Agent</template>
+            <name>Template NiceHash QuickMiner Excavator API by Zabbix Agent</name>
+            <description>On Windows machine.&#13;
+&#13;
+Copy config nicehash_quickminer_excavator_api.conf -&gt; zabbix_agentd.conf.d&#13;
+&#13;
+Install NiceHash QuickMiner&#13;
+- Go to settings: Rigth click -&gt; Settings -&gt; Edit Config File&#13;
+- Adjust IP and Port: &quot;watchDogAPIHost” : “YOUR_HOST_IP”&#13;
+- Enable API and add Token: &quot;launchCommandLine&quot; : &quot;-qx -qm -d 2 -f 0 -wp -wa FFE23B571DA5444105122C17&quot;,&#13;
+&#13;
+In template&#13;
+- Adjust Macros</description>
+            <groups>
+                <group>
+                    <name>Mining</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>NiceHash QuickMiner Excavator</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Mining Algorithm Uptime</name>
+                    <key>excavator.api.algorithm.list[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, uptime]</key>
+                    <delay>10s</delay>
+                    <units>s</units>
+                    <applications>
+                        <application>
+                            <name>NiceHash QuickMiner Excavator</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.algorithms[?(@.name == &quot;daggerhashimoto&quot;)].uptime</params>
+                        </step>
+                        <step>
+                            <type>TRIM</type>
+                            <params>[]</params>
+                        </step>
+                        <step>
+                            <type>JAVASCRIPT</type>
+                            <params>return Math.round(value * 1)</params>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata(1m)}=1</expression>
+                            <name>Mining algorithm down (NiceHash QuickMiner Excavator)</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>Mining Soft down (NiceHash QuickMiner Excavator)</name>
+                                    <expression>{Template NiceHash QuickMiner Excavator API by Zabbix Agent:excavator.api.info[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, uptime].nodata(1m)}=1</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                        <trigger>
+                            <expression>{last()}&lt;5m</expression>
+                            <name>Mining Algorithm has been restarted (uptime &lt; 5m) (NiceHash QuickMiner Excavator)</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>Mining algorithm down (NiceHash QuickMiner Excavator)</name>
+                                    <expression>{Template NiceHash QuickMiner Excavator API by Zabbix Agent:excavator.api.algorithm.list[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, uptime].nodata(1m)}=1</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>Mining Soft down (NiceHash QuickMiner Excavator)</name>
+                                    <expression>{Template NiceHash QuickMiner Excavator API by Zabbix Agent:excavator.api.info[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, uptime].nodata(1m)}=1</expression>
+                                </dependency>
+                                <dependency>
+                                    <name>Mining Soft has been restarted (uptime &lt; 10m) (NiceHash QuickMiner Excavator)</name>
+                                    <expression>{Template NiceHash QuickMiner Excavator API by Zabbix Agent:excavator.api.info[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, uptime].last()}&lt;10m</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Total shares accepted by the remote pool</name>
+                    <key>excavator.api.algorithm.list[{$WATCHDOG_API_HOST},{$WATCHDOG_API_PORT},{#DEVICE_ID},accepted_shares]</key>
+                    <delay>10s</delay>
+                    <applications>
+                        <application>
+                            <name>NiceHash QuickMiner Excavator</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.algorithms[?(@.name == &quot;daggerhashimoto&quot;)].accepted_shares</params>
+                        </step>
+                        <step>
+                            <type>TRIM</type>
+                            <params>[]</params>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
+                    <name>Difficulty for current job</name>
+                    <key>excavator.api.algorithm.list[{$WATCHDOG_API_HOST},{$WATCHDOG_API_PORT},{#DEVICE_ID},current_job_difficulty]</key>
+                    <delay>10s</delay>
+                    <value_type>FLOAT</value_type>
+                    <description>Note that, to the contrary of other PPLNS pools, for NiceHash, these values are not important. The reason is, because each share has a certain value that may not be the same. NiceHash does not have a fixed difficulty but rather dynamic. Higher difficulty shares have higher value. Since NiceHash has a PPS payout scheme (pay-per-share), it is very important to know the value of the share (share at twice the difficulty is worth twice as much BTC). If you chart down shares with their values, you get accepted/rejected speed.</description>
+                    <applications>
+                        <application>
+                            <name>NiceHash QuickMiner Excavator</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.algorithms[?(@.name == &quot;daggerhashimoto&quot;)].current_job_difficulty</params>
+                        </step>
+                        <step>
+                            <type>TRIM</type>
+                            <params>[]</params>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
+                    <name>Total shares rejected by the remote pool</name>
+                    <key>excavator.api.algorithm.list[{$WATCHDOG_API_HOST},{$WATCHDOG_API_PORT},{#DEVICE_ID},rejected_shares]</key>
+                    <delay>10s</delay>
+                    <applications>
+                        <application>
+                            <name>NiceHash QuickMiner Excavator</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.algorithms[?(@.name == &quot;daggerhashimoto&quot;)].rejected_shares</params>
+                        </step>
+                        <step>
+                            <type>TRIM</type>
+                            <params>[]</params>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;0</expression>
+                            <name>Total shares rejected by the remote pool &gt; 0 (NiceHash QuickMiner Excavator)</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Mining Soft Uptime</name>
+                    <key>excavator.api.info[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, uptime]</key>
+                    <delay>10s</delay>
+                    <units>s</units>
+                    <applications>
+                        <application>
+                            <name>NiceHash QuickMiner Excavator</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.uptime</params>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <triggers>
+                        <trigger>
+                            <expression>{nodata(1m)}=1</expression>
+                            <name>Mining Soft down (NiceHash QuickMiner Excavator)</name>
+                            <priority>AVERAGE</priority>
+                        </trigger>
+                        <trigger>
+                            <expression>{last()}&lt;10m</expression>
+                            <name>Mining Soft has been restarted (uptime &lt; 10m) (NiceHash QuickMiner Excavator)</name>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>NiceHash QuickMiner Version</name>
+                    <key>excavator.api.info[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, version]</key>
+                    <delay>10s</delay>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <applications>
+                        <application>
+                            <name>NiceHash QuickMiner Excavator</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.version</params>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <triggers>
+                        <trigger>
+                            <expression>{diff()}=1&#13;
+and&#13;
+{strlen()}&gt;0</expression>
+                            <name>NiceHash QuickMiner Version has changed (new version: {ITEM.VALUE})</name>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>excavator.api.device.list</name>
+                    <key>excavator.api.device.list[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}]</key>
+                    <delay>1h</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>GPU {#DEVICE_ID}: {#NAME} HW Errors</name>
+                            <key>excavator.api.device.get[{$WATCHDOG_API_HOST},{$WATCHDOG_API_PORT},{#DEVICE_ID},errors]</key>
+                            <delay>10s</delay>
+                            <description>Number of shares above target generated by this device.&#13;
+&#13;
+BUS_ID: {#BUS_ID}&#13;
+DISPLAY_MODE: {#DISPLAY_MODE}&#13;
+SUBVENDOR: {#SUBVENDOR}&#13;
+RAM_MAKER: {#RAM_MAKER}&#13;
+UUID: {#UUID}&#13;
+PCI_IDENT: {#PCI_IDENT}</description>
+                            <applications>
+                                <application>
+                                    <name>NiceHash QuickMiner Excavator</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.device.hw_errors</params>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&gt;0</expression>
+                                    <name>GPU {#DEVICE_ID}: {#NAME} HW Errors &gt; 0 (NiceHash QuickMiner Excavator)</name>
+                                    <priority>WARNING</priority>
+                                    <description>Number of shares above target generated by this device.&#13;
+&#13;
+BUS_ID: {#BUS_ID}&#13;
+DISPLAY_MODE: {#DISPLAY_MODE}&#13;
+SUBVENDOR: {#SUBVENDOR}&#13;
+RAM_MAKER: {#RAM_MAKER}&#13;
+UUID: {#UUID}&#13;
+PCI_IDENT: {#PCI_IDENT}</description>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>GPU {#DEVICE_ID}: {#NAME} HW Success</name>
+                            <key>excavator.api.device.get[{$WATCHDOG_API_HOST},{$WATCHDOG_API_PORT},{#DEVICE_ID},success]</key>
+                            <delay>10s</delay>
+                            <description>Number of accepted shares generated by this device.&#13;
+&#13;
+BUS_ID: {#BUS_ID}&#13;
+DISPLAY_MODE: {#DISPLAY_MODE}&#13;
+SUBVENDOR: {#SUBVENDOR}&#13;
+RAM_MAKER: {#RAM_MAKER}&#13;
+UUID: {#UUID}&#13;
+PCI_IDENT: {#PCI_IDENT}</description>
+                            <applications>
+                                <application>
+                                    <name>NiceHash QuickMiner Excavator</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.device.hw_errors_success</params>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>GPU {#DEVICE_ID}: {#NAME} Hashrate</name>
+                            <key>excavator.api.worker.list[{$WATCHDOG_API_HOST},{$WATCHDOG_API_PORT},{#DEVICE_ID}]</key>
+                            <delay>10s</delay>
+                            <value_type>FLOAT</value_type>
+                            <units>MH/s</units>
+                            <description>Algorithm speed.&#13;
+&#13;
+BUS_ID: {#BUS_ID}&#13;
+DISPLAY_MODE: {#DISPLAY_MODE}&#13;
+SUBVENDOR: {#SUBVENDOR}&#13;
+RAM_MAKER: {#RAM_MAKER}&#13;
+UUID: {#UUID}&#13;
+PCI_IDENT: {#PCI_IDENT}</description>
+                            <applications>
+                                <application>
+                                    <name>NiceHash QuickMiner Excavator</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.workers[{#DEVICE_ID}].algorithms[?(@.name == &quot;daggerhashimoto&quot;)].speed</params>
+                                </step>
+                                <step>
+                                    <type>TRIM</type>
+                                    <params>[]</params>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>0.000001</params>
+                                </step>
+                                <step>
+                                    <type>JAVASCRIPT</type>
+                                    <params>return Math.round(value * 100) / 100</params>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED</type>
+                                    <params/>
+                                </step>
+                            </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{max(5m)}&lt;{$NICEHASH_MIN_HASHRATE:&quot;{#NAME}&quot;}</expression>
+                                    <name>GPU {#DEVICE_ID}: {#NAME} Hashrate &lt; {$NICEHASH_MIN_HASHRATE:&quot;{#NAME}&quot;} MH/s (NiceHash QuickMiner Excavator)</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>Mining algorithm down (NiceHash QuickMiner Excavator)</name>
+                                            <expression>{Template NiceHash QuickMiner Excavator API by Zabbix Agent:excavator.api.algorithm.list[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, uptime].nodata(1m)}=1</expression>
+                                        </dependency>
+                                        <dependency>
+                                            <name>Mining Algorithm has been restarted (uptime &lt; 5m) (NiceHash QuickMiner Excavator)</name>
+                                            <expression>{Template NiceHash QuickMiner Excavator API by Zabbix Agent:excavator.api.algorithm.list[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, uptime].last()}&lt;5m</expression>
+                                        </dependency>
+                                        <dependency>
+                                            <name>Mining Soft down (NiceHash QuickMiner Excavator)</name>
+                                            <expression>{Template NiceHash QuickMiner Excavator API by Zabbix Agent:excavator.api.info[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, uptime].nodata(1m)}=1</expression>
+                                        </dependency>
+                                        <dependency>
+                                            <name>Mining Soft has been restarted (uptime &lt; 10m) (NiceHash QuickMiner Excavator)</name>
+                                            <expression>{Template NiceHash QuickMiner Excavator API by Zabbix Agent:excavator.api.info[{$WATCHDOG_API_HOST}, {$WATCHDOG_API_PORT}, uptime].last()}&lt;10m</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#DEVICE_ID}</lld_macro>
+                            <path>$.device_id</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#NAME}</lld_macro>
+                            <path>$.name</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#UUID}</lld_macro>
+                            <path>$.uuid</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#RAM_MAKER}</lld_macro>
+                            <path>$.details.ram_maker</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#DISPLAY_MODE}</lld_macro>
+                            <path>$.display_mode</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#PCI_IDENT}</lld_macro>
+                            <path>$.details.pci_ident</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#SUBVENDOR}</lld_macro>
+                            <path>$.subvendor</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#BUS_ID}</lld_macro>
+                            <path>$.details.bus_id</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.devices</params>
+                        </step>
+                    </preprocessing>
+                </discovery_rule>
+            </discovery_rules>
+            <tags>
+                <tag>
+                    <tag>Custom</tag>
+                </tag>
+            </tags>
+            <macros>
+                <macro>
+                    <macro>{$NICEHASH_MIN_HASHRATE}</macro>
+                    <value>58</value>
+                    <description>MH/s Use {$NICEHASH_MIN_HASHRATE:&quot;GeForce RTX 3070&quot;} for different GPUs</description>
+                </macro>
+                <macro>
+                    <macro>{$WATCHDOG_API_HOST}</macro>
+                    <value>localhost</value>
+                    <description>nhqm.conf &quot;watchDogAPIHost&quot;: IP or localhost</description>
+                </macro>
+                <macro>
+                    <macro>{$WATCHDOG_API_PORT}</macro>
+                    <value>18000</value>
+                    <description>nhqm.conf &quot;watchDogAPIPort&quot;</description>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>
