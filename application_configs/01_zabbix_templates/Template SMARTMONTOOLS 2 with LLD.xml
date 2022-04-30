@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-12-28T17:24:38Z</date>
+    <date>2022-01-10T18:26:58Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -855,7 +855,7 @@ NVMe: Supported</description>
                                 <trigger_prototype>
                                     <expression>{avg(5m)}&gt;{$TEMP_WARN:&quot;HDD&quot;}</expression>
                                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                                    <recovery_expression>{avg(5m)}&lt;{$TEMP_WARN:&quot;HDD&quot;}-3</recovery_expression>
+                                    <recovery_expression>{avg(5m)}&lt;{$TEMP_WARN:&quot;HDD&quot;}</recovery_expression>
                                     <name>{#DISKNAME}: Disk temperature: {ITEM.LASTVALUE}</name>
                                     <priority>WARNING</priority>
                                     <manual_close>YES</manual_close>

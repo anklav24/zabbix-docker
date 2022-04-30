@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2022-01-02T00:24:06Z</date>
+    <date>2022-01-10T18:25:01Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -31,7 +31,7 @@
                 <item>
                     <name>Number of GPUs</name>
                     <key>gpu.number</key>
-                    <delay>5s</delay>
+                    <delay>10s</delay>
                     <value_type>FLOAT</value_type>
                     <description>The number of GPUs present on this system.</description>
                     <applications>
@@ -59,7 +59,7 @@
                         <item_prototype>
                             <name>GPU {#GPUINDEX}: {#GPUMODEL} Fan Speed</name>
                             <key>gpu.fanspeed[{#GPUINDEX}]</key>
-                            <delay>5s</delay>
+                            <delay>10s</delay>
                             <history>7d</history>
                             <units>%</units>
                             <applications>
@@ -75,10 +75,11 @@
                             </preprocessing>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{avg(10s)}&lt;{$FAN_SPEED_MIN_GPU:&quot;{#GPUMODEL}&quot;}&#13;
+                                    <expression>{max(1m)}&lt;{$FAN_SPEED_MIN_GPU:&quot;{#GPUMODEL}&quot;}&#13;
 or&#13;
-{avg(10s)}&gt;{$FAN_SPEED_MAX_GPU:&quot;{#GPUMODEL}&quot;}</expression>
+{min(10s)}&gt;{$FAN_SPEED_MAX_GPU:&quot;{#GPUMODEL}&quot;}</expression>
                                     <name>GPU {#GPUINDEX}: {#GPUMODEL} {$FAN_SPEED_MIN_GPU:&quot;{#GPUMODEL}&quot;}% &gt; Fan Speed &gt; {$FAN_SPEED_MAX_GPU:&quot;{#GPUMODEL}&quot;}%</name>
+                                    <opdata>ITEM.VALUE: {ITEM.VALUE} ITEM.LASTVALUE: {ITEM.LASTVALUE}</opdata>
                                     <priority>AVERAGE</priority>
                                     <manual_close>YES</manual_close>
                                 </trigger_prototype>
@@ -87,7 +88,7 @@ or&#13;
                         <item_prototype>
                             <name>GPU {#GPUINDEX}: {#GPUMODEL} Memory Free</name>
                             <key>gpu.memfree[{#GPUINDEX}]</key>
-                            <delay>5s</delay>
+                            <delay>10s</delay>
                             <history>7d</history>
                             <units>b</units>
                             <applications>
@@ -103,7 +104,7 @@ or&#13;
                             </preprocessing>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{avg(5m)}&lt;{$MEMORY_FREE_GPU:&quot;{#GPUMODEL}&quot;}</expression>
+                                    <expression>{max(5m)}&lt;{$MEMORY_FREE_GPU:&quot;{#GPUMODEL}&quot;}</expression>
                                     <name>GPU {#GPUINDEX}: {#GPUMODEL} Memory Free &lt; {$MEMORY_FREE_GPU:&quot;{#GPUMODEL}&quot;}</name>
                                     <priority>WARNING</priority>
                                     <manual_close>YES</manual_close>
@@ -113,7 +114,7 @@ or&#13;
                         <item_prototype>
                             <name>GPU {#GPUINDEX}: {#GPUMODEL} Memory Total</name>
                             <key>gpu.memtotal[{#GPUINDEX}]</key>
-                            <delay>5s</delay>
+                            <delay>1d</delay>
                             <history>7d</history>
                             <units>b</units>
                             <applications>
@@ -127,11 +128,19 @@ or&#13;
                                     <params>1000000</params>
                                 </step>
                             </preprocessing>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff()}=1</expression>
+                                    <name>GPU {#GPUINDEX}: {#GPUMODEL} Total memory has changed  (new value: {ITEM.VALUE})</name>
+                                    <priority>DISASTER</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <name>GPU {#GPUINDEX}: {#GPUMODEL} Memory Used</name>
                             <key>gpu.memused[{#GPUINDEX}]</key>
-                            <delay>5s</delay>
+                            <delay>10s</delay>
                             <history>7d</history>
                             <units>b</units>
                             <applications>
@@ -149,7 +158,7 @@ or&#13;
                         <item_prototype>
                             <name>GPU {#GPUINDEX}: {#GPUMODEL} Power in Watts</name>
                             <key>gpu.power[{#GPUINDEX}]</key>
-                            <delay>5s</delay>
+                            <delay>10s</delay>
                             <history>7d</history>
                             <value_type>FLOAT</value_type>
                             <units>W</units>
@@ -160,7 +169,7 @@ or&#13;
                             </applications>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{avg(5m)}&lt;{$POWER_MIN_GPU:&quot;{#GPUMODEL}&quot;}&#13;
+                                    <expression>{max(5m)}&lt;{$POWER_MIN_GPU:&quot;{#GPUMODEL}&quot;}&#13;
 or&#13;
 {last()}&gt;{$POWER_MAX_GPU:&quot;{#GPUMODEL}&quot;}</expression>
                                     <name>GPU {#GPUINDEX}: {#GPUMODEL} {$POWER_MIN_GPU:&quot;{#GPUMODEL}&quot;}W &gt; Power in Watts &gt; {$POWER_MAX_GPU:&quot;{#GPUMODEL}&quot;}W</name>
@@ -172,7 +181,7 @@ or&#13;
                         <item_prototype>
                             <name>GPU {#GPUINDEX}: {#GPUMODEL} Temperature</name>
                             <key>gpu.temp[{#GPUINDEX}]</key>
-                            <delay>5s</delay>
+                            <delay>10s</delay>
                             <history>7d</history>
                             <value_type>FLOAT</value_type>
                             <units>C</units>
@@ -225,7 +234,7 @@ or&#13;
                         <item_prototype>
                             <name>GPU {#GPUINDEX}: {#GPUMODEL} Utilization</name>
                             <key>gpu.utilization[{#GPUINDEX}]</key>
-                            <delay>5s</delay>
+                            <delay>10s</delay>
                             <history>7d</history>
                             <units>%</units>
                             <applications>
@@ -235,7 +244,7 @@ or&#13;
                             </applications>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>{avg(5m)}&lt;{$UTILIZATION:&quot;GPU&quot;}</expression>
+                                    <expression>{max(5m)}&lt;{$UTILIZATION:&quot;GPU&quot;}</expression>
                                     <name>GPU {#GPUINDEX}: {#GPUMODEL} Utilization &lt; {$UTILIZATION:&quot;GPU&quot;}%</name>
                                     <priority>WARNING</priority>
                                     <manual_close>YES</manual_close>
