@@ -5,6 +5,7 @@ days_to_keep=$2
 postgres_user=$3
 postgres_password=$4
 debug=$5
+limit=30
 
 db_docker_name=zabbix-docker-postgres-server-1
 config_source_dir=deploy_configs
@@ -45,7 +46,7 @@ echo "$task_name backup has started: $timestamp" |& tee -a $logfile_path
 # Zabbix DB backup
 echo "postgres..." |& tee -a $logfile_path
 docker exec $db_docker_name pg_dump -U $postgres_user $postgres_password \
-| gzip -9 > "$backup_path_timestamp/postgres_$timestamp.sql.gz" \
+| cpulimit --limit $limit --foreground --lazy -- gzip -9 > "$backup_path_timestamp/postgres_$timestamp.sql.gz" \
 |& tee -a $logfile_path
 
 # Env and settings files backup
