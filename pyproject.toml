@@ -1,0 +1,24 @@
+# https://github.com/relekang/python-semantic-release
+
+# semantic-release --noop --unreleased changelog
+# semantic-release --noop version
+# semantic-release publish
+
+[tool.version]
+version = "1.1.1"
+
+[tool.semantic_release]
+version_toml = [
+    "pyproject.toml:tool.version.version"
+]
+
+commit_subject = "chore(release): v{version}"
+tag_format = "v{version}"
+
+version_source = "commit"
+patch_without_tag = false
+tag_commit = false
+
+upload_to_repository = false
+branch = "master"
+
