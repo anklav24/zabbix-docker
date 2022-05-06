@@ -5,7 +5,7 @@ days_to_keep=$2
 postgres_user=$3
 postgres_password=$4
 debug=$5
-limit=30
+limit=10
 
 db_docker_name=zabbix-docker-postgres-server-1
 config_source_dir=deploy_configs
