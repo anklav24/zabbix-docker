@@ -5,7 +5,7 @@
 # semantic-release publish
 
 [tool.version]
-version = "1.1.0"
+version = "1.2.0"
 
 [tool.semantic_release]
 version_toml = [
@@ -20,5 +20,5 @@ patch_without_tag = false
 tag_commit = false
 
 upload_to_repository = false
-branch = "master"
+branch = "develop"
 
