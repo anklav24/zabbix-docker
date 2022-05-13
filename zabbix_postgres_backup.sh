@@ -11,7 +11,7 @@ db_docker_name=zabbix-docker-postgres-server-1
 config_source_dir=deploy_configs
 backup_dir_name=./zabbix_postgres_backup
 combine_file_name=zabbix
-gdrive_folder_id=1dBFaF8Li96hVlH5UIOCnraxY4Nh7whYf
+gdrive_folder_id=1MdZZ-oAGtfIAM8DtiYu629n2sC3l0KUd
 
 keep_log_lines=300
 
