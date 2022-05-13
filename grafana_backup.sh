@@ -8,7 +8,7 @@ wp_source_dir=/var/lib/docker/volumes/zabbix-docker_grafana_storage/_data
 config_source_dir=deploy_configs
 backup_dir_name=./grafana_backup
 combine_file_name=grafana
-gdrive_folder_id=1d1qCS_daTeoD1vUebqzGedPrIUiRaZWJ
+gdrive_folder_id=1tZGviGEa72TSxCFjO6Gz3-de9c5AFvfe
 
 keep_log_lines=300
 
