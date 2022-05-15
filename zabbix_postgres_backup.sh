@@ -11,7 +11,7 @@ db_docker_name=zabbix-docker-postgres-server-1
 config_source_dir=deploy_configs
 backup_dir_name=./zabbix_postgres_backup
 combine_file_name=zabbix
-gdrive_folder_id=1dBFaF8Li96hVlH5UIOCnraxY4Nh7whYf
+gdrive_folder_id=1MdZZ-oAGtfIAM8DtiYu629n2sC3l0KUd
 
 keep_log_lines=300
 
@@ -63,9 +63,27 @@ rm -rf $backup_path_timestamp
 
 # Backup to Google Drive
 if [[ "$task_name" =~ ^(monthly|yearly)$ ]]; then
-echo "Uploading to google drive..." |& tee -a $logfile_path
-echo gdrive_folder_id: $gdrive_folder_id "$backup_task_path"/"$combine_file_name"_"$timestamp.tar" |& tee -a $logfile_path
-gdrive upload --parent $gdrive_folder_id "$backup_task_path"/"$combine_file_name"_"$timestamp.tar"
+    echo "Uploading to google drive..." |& tee -a $logfile_path
+    echo gdrive_folder_id: $gdrive_folder_id "$backup_task_path"/"$combine_file_name"_"$timestamp.tar" |& tee -a $logfile_path
+    gdrive upload --parent $gdrive_folder_id "$backup_task_path"/"$combine_file_name"_"$timestamp.tar"
+fi
+
+# Backup to Yandex Disk
+if [[ "$task_name" =~ ^(monthly|yearly)$ ]]; then
+    echo "Uploading to yandex disk..." |& tee -a $logfile_path
+    yandex_token=$(grep YANDEX_TOKEN .env | cut -f2 -d=)
+    filepath="$backup_task_path"/"$combine_file_name"_"$timestamp.tar"
+    filename="$combine_file_name"_"$timestamp.tar"
+    ya_disk_path="Backups/zabbix_backup/$filename"
+    echo ya_disk_path: "$ya_disk_path" |& tee -a $logfile_path
+
+    curl -v -H "Authorization: OAuth $yandex_token" \
+            -H "Etag: $(md5sum $filepath | cut -f1 -d' ')" \
+            -H "Sha256: $(sha256sum $filepath | cut -f1 -d' ')" \
+            -H "Content-Type: application/binary" \
+            -X PUT https://webdav.yandex.ru/"$ya_disk_path" \
+            --data-binary "@$filepath" \
+            |& tee -a /dev/null
 fi
 
 # Log rotate
