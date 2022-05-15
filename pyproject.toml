@@ -5,7 +5,7 @@
 # semantic-release publish
 
 [tool.version]
-version = "1.2.0"
+version = "1.3.0"
 
 [tool.semantic_release]
 version_toml = [
