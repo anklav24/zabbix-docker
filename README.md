@@ -1,4 +1,4 @@
-# Zabbix, PostgreSQL (Timescale DB), Grafana, Traefik (TLS, HTTPS), Backup (Local and Google Drive)
+# Zabbix, PostgreSQL (Timescale DB), Grafana, Traefik (TLS, HTTPS), Backup (Local and Google Drive, Yandex Disk)
 
 ## Overview
 
@@ -87,6 +87,11 @@ gdrive list --absolute --query "mimeType = 'application/vnd.google-apps.folder' 
 ```
 
 - Change in `grafana_backup.sh` and `zabbix_postgres_backup.sh` `gdrive_folder_id` variable to your `Id`
+
+### Setup Yandex Drive Aouth token
+
+- In `.env` add your `YANDEX_TOKEN`
+- Go to web yandex disk and create folder /backups/zabbix_backup/ or change the path in the backup scripts (Do the same for grafana_backup)
 
 ### Setup Systemd service
 
