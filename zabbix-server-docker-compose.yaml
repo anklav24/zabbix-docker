@@ -40,15 +40,22 @@ services:
     restart: always
 
   zabbix-agent:
-    image: zabbix/zabbix-agent:ubuntu-5.0.16
+    build:
+      context: ./Dockerfiles/agent/ubuntu
+      cache_from:
+       - ubuntu:focal
+      args:
+        BUILD_BASE_IMAGE: zabbix/zabbix-build-pgsql:ubuntu-5.0.17
+    image: zabbix-agent:ubuntu-local
 
-    cpu_quota: 10000  # 1000 = 1%
-    mem_reservation: 8M
+    cpu_quota: 30000  # 1000 = 1%
+    mem_reservation: 32M
 
     ports:
       - "10050:10050"
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - ./application_configs/02_zabbix_agent_linux/user_scripts:/user_scripts:ro
       - ./zbx_env/etc/zabbix/zabbix_agentd.d:/etc/zabbix/zabbix_agentd.d:ro
       - ./zbx_env/var/lib/zabbix/modules:/var/lib/zabbix/modules:ro
       - ./zbx_env/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
