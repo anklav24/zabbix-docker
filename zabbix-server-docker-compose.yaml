@@ -48,8 +48,8 @@ services:
         BUILD_BASE_IMAGE: zabbix/zabbix-build-pgsql:ubuntu-5.0.17
     image: zabbix-agent:ubuntu-local
 
-    cpu_quota: 10000  # 1000 = 1%
-    mem_reservation: 8M
+    cpu_quota: 30000  # 1000 = 1%
+    mem_reservation: 32M
 
     ports:
       - "10050:10050"

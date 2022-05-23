@@ -43,11 +43,13 @@ RUN set -eux && \
             libpcre2-8-0 \
             curl \
             python3 \
+            python3-pip \
             libldap-2.4" && \
     apt-get -y update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y \
             --no-install-recommends install \
         ${INSTALL_PKGS} && \
+    pip3 install requests && \
     groupadd \
             --system \
             --gid 1995 \
