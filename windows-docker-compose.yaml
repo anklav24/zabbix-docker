@@ -2,7 +2,7 @@ version: '2.4'
 
 services:
   zabbix-server:
-    image: zabbix/zabbix-server-pgsql:ubuntu-5.0.16
+    image: zabbix/zabbix-server-pgsql:ubuntu-6.0.8
 
     cpu_quota: 30000  # 1000 = 1%
     mem_reservation: 256M
@@ -40,7 +40,7 @@ services:
     restart: always
 
   zabbix-agent:
-    image: zabbix/zabbix-agent:ubuntu-5.0.16
+    image: zabbix/zabbix-agent:ubuntu-6.0.8
 
     cpu_quota: 10000  # 1000 = 1%
     mem_reservation: 8M
@@ -65,9 +65,9 @@ services:
     restart: always
 
   postgres-server:
-    image: timescale/timescaledb:2.5.1-pg12
+    image: timescale/timescaledb:2.7.2-pg14
 
-    cpu_quota: 70000  # 1000 = 1%
+    cpu_quota: 90000  # 1000 = 1%
     mem_reservation: 256M
 
     ports:
@@ -76,7 +76,6 @@ services:
       - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
     env_file:
       - ./deploy_configs/env_vars/.env_db_pgsql
-    command: -c 'max_connections=200'
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
@@ -88,52 +87,8 @@ services:
       zbx_net_backend:
     restart: always
 
-  traefik:
-    image: traefik:v2.5.3
-
-    cpu_quota: 10000  # 1000 = 1%
-    mem_reservation: 64M
-
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - traefik-ssl-certs:/ssl-certs
-      - /var/log/traefik:/var/log/traefik
-      - ./deploy_configs/traefik/:/etc/traefik/
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
-      - traefik.http.routers.dashboard.rule=Host(`traefik.zabbix-web24.duckdns.org`)
-      - traefik.http.routers.dashboard.tls.certresolver=${CASERVER}
-      - traefik.http.services.dashboard.loadbalancer.server.port=8080
-
-      - traefik.enable=true
-      - traefik.http.routers.dashboard.tls=true
-      - traefik.http.routers.dashboard.entrypoints=http,https
-      - traefik.http.routers.dashboard.middlewares=secheaders@file
-
-      # Restricted access by IP
-      - traefik.http.middlewares.traefik-ipwhitelist.ipwhitelist.sourcerange=${IPWHITELIST}
-      - traefik.http.routers.dashboard.middlewares=traefik-auth,traefik-ipwhitelist
-
-      # Basic Authentication for Traefik Dashboard
-      - traefik.http.routers.dashboard.service=api@internal
-      - traefik.http.middlewares.traefik-auth.basicauth.users=${LOGIN}:${PASS_PART_1}${PASS_PART_2}
-    healthcheck:
-      test: [ "CMD", "wget", "http://localhost:8082/ping","--spider" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
-    security_opt:
-      - no-new-privileges:true
-    networks:
-      zbx_net_frontend:
-    restart: always
-
   zabbix-web-nginx-pgsql:
-    image: zabbix/zabbix-web-nginx-pgsql:ubuntu-5.0.16
+    image: zabbix/zabbix-web-nginx-pgsql:ubuntu-6.0.8
 
     cpu_quota: 90000  # 1000 = 1%
     mem_reservation: 256M
@@ -178,41 +133,6 @@ services:
       zbx_net_backend:
     restart: always
 
-  grafana: # optional more functional and creative UI for zabbix
-    image: grafana/grafana:8.2.0-ubuntu
-
-    cpu_quota: 80000  # 1000 = 1%
-    mem_reservation: 128M
-
-    ports:
-      - "3000:3000"
-
-    volumes:
-      - grafana_storage:/var/lib/grafana
-      - ./deploy_configs/grafana/grafana.ini:/etc/grafana/grafana.ini
-    env_file:
-      - ./deploy_configs/grafana/.env_grafana
-    depends_on:
-      - zabbix-web-nginx-pgsql
-    labels:
-      - traefik.http.routers.grafana.rule=Host(`grafana.zabbix-web24.duckdns.org`)
-      - traefik.http.routers.grafana.tls.certresolver=${CASERVER}
-      - traefik.http.services.grafana.loadbalancer.server.port=3000
-      - traefik.docker.network=zabbix-docker_zbx_net_frontend
-
-      - traefik.enable=true
-      - traefik.http.routers.grafana.tls=true
-      - traefik.http.routers.grafana.entrypoints=http,https
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-    networks:
-      zbx_net_frontend:
-    restart: always
-
 networks:
   zbx_net_frontend:
     driver: bridge
@@ -232,5 +152,4 @@ networks:
         - subnet: 172.16.239.0/24
 
 volumes:  # Persistent data
-  grafana_storage:
   traefik-ssl-certs:
