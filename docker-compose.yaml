@@ -59,8 +59,10 @@ services:
   zabbix-postgres:
     image: timescale/timescaledb:2.7.2-pg14
     container_name: zabbix-postgres
+    environment:
+      PGPORT: 5442
     ports:
-      - "5432:5432"
+      - "5442:5442"
     volumes:
       - ./zbx_env/var/lib/postgresql/data:/var/lib/postgresql/data:rw
     env_file:
