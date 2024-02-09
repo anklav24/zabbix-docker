@@ -1,0 +1,116 @@
+zabbix_export:
+  version: '6.0'
+  date: '2024-02-09T14:49:31Z'
+  groups:
+    -
+      uuid: dc579cd7a1a34222933f24f52a68bcd8
+      name: 'Linux servers'
+  templates:
+    -
+      uuid: e4e47367a4ef406aa61f2875c092b05d
+      template: lm-sensors
+      name: lm-sensors
+      description: |
+        Monitoring hardware sensors on a linux server
+        
+        - Needed Zabbix Agent 2
+        - For proxmox server
+           - Install sudo: apt install sudo
+           - Add visudo: zabbix ALL=(ALL) NOPASSWD:/usr/sbin/smartctl
+      groups:
+        -
+          name: 'Linux servers'
+      items:
+        -
+          uuid: dbac3ad64d864f3f8146e554cb92b0ef
+          name: 'CPU Temperature'
+          key: 'sensor[k10temp-pci-00c3,temp3]'
+          delay: 10s
+          value_type: FLOAT
+          units: °C
+          tags:
+            -
+              tag: component
+              value: cpu
+            -
+              tag: Hardware
+              value: lm-sensors
+          triggers:
+            -
+              uuid: 984e1f9529fc42b7a3a4c80575ffa378
+              expression: 'min(/lm-sensors/sensor[k10temp-pci-00c3,temp3],30s)>{$CRIT_CPU_TEMP}'
+              name: 'CPU Temp > {$CRIT_CPU_TEMP}'
+              priority: DISASTER
+              manual_close: 'YES'
+        -
+          uuid: 4909663d61db49ccb85592930ed7dd5f
+          name: 'Fan 2'
+          key: 'sensor[nct6797-isa-0a20,fan2]'
+          delay: 10s
+          units: RPM
+          tags:
+            -
+              tag: component
+              value: fans
+            -
+              tag: Hardware
+              value: lm-sensors
+          triggers:
+            -
+              uuid: 08c37ddb4b344a16a53b75a8bb1b519e
+              expression: 'max(/lm-sensors/sensor[nct6797-isa-0a20,fan2],30)<{$MIN_FAN_SPEED}'
+              name: 'Fan 2 speed < {$MIN_FAN_SPEED}'
+              priority: HIGH
+              manual_close: 'YES'
+        -
+          uuid: 4b55903b5df74769a2cf0769e959496b
+          name: 'Fan 3'
+          key: 'sensor[nct6797-isa-0a20,fan3]'
+          delay: 10s
+          units: RPM
+          tags:
+            -
+              tag: component
+              value: fans
+            -
+              tag: Hardware
+              value: lm-sensors
+          triggers:
+            -
+              uuid: 2b239251224f4a18a74fb1f85bdf6584
+              expression: 'max(/lm-sensors/sensor[nct6797-isa-0a20,fan3],30)<{$MIN_FAN_SPEED}'
+              name: 'Fan 3 speed < {$MIN_FAN_SPEED}'
+              priority: HIGH
+              manual_close: 'YES'
+        -
+          uuid: 0bb1a4b5e098477582785f9ce45ce40d
+          name: 'Fan 4'
+          key: 'sensor[nct6797-isa-0a20,fan4]'
+          delay: 10s
+          value_type: FLOAT
+          units: RPM
+          tags:
+            -
+              tag: component
+              value: fans
+            -
+              tag: Hardware
+              value: lm-sensors
+          triggers:
+            -
+              uuid: cf0e5446705d4a7d94971f12e2e62f61
+              expression: 'max(/lm-sensors/sensor[nct6797-isa-0a20,fan4],30)<{$MIN_FAN_SPEED}'
+              name: 'Fan 4 speed < {$MIN_FAN_SPEED}'
+              priority: HIGH
+              manual_close: 'YES'
+      tags:
+        -
+          tag: Hardware
+          value: lm-sensors
+      macros:
+        -
+          macro: '{$CRIT_CPU_TEMP}'
+          value: '85'
+        -
+          macro: '{$MIN_FAN_SPEED}'
+          value: '1000'
